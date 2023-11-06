@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/chess")
 public class Controller {
 
-    private Service service;
+    private final Service service;
 
     public Controller(Service service) {
         this.service = service;
@@ -18,7 +18,7 @@ public class Controller {
     public ResponseEntity<String> getSelectedSquare(@RequestParam String move) {
 
         //1. send the request to the service layer to handle the move
-
+        service.makeMove(move);
         //2. when done return a redirect back to the website
 
         return ResponseEntity.ok(move);

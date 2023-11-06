@@ -1,40 +1,79 @@
 package grim.readmechess;
 
-import grim.readmechess.webapi.chessboard.ChessBoard;
-import org.junit.After;
-import org.junit.Before;
+import grim.readmechess.webapi.chessboard.Board;
+import grim.readmechess.webapi.chesspieces.Bishop;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class ReadmeChessApplicationTests {
+	@Test
+	void testGetPosition() {
+		// Arrange
+		Bishop bishop = new Bishop("black", "c4");
+		String expectedPosition = "c4";
+
+		// Act
+		String actualPosition = bishop.getPosition();
+
+		// Assert
+		assertEquals(expectedPosition, actualPosition);
+	}
 
 	@Test
-	void shouldPrintTheChessBoard() {
+	void testSetPosition() {
 		// Arrange
-		ChessBoard chessBoard = new ChessBoard("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
-		String expectedOutput =
-						"r n b q k b n r\n" +
-						"p p . p p p p p\n" +
-						". . . . . . . .\n" +
-						". . p . . . . .\n" +
-						". . . . P . . .\n" +
-						". . . . . N . .\n" +
-						"P P P P . P P P\n" +
-						"R N B Q K B . R\n";
+		Bishop bishop = new Bishop("black", "c4");
+		String newPosition = "d5";
 
-		ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
-		System.setOut(new PrintStream(outputStreamCaptor));
-		PrintStream originalOut = System.out;
 		// Act
-		chessBoard.printChessBoardToConsole();
+		bishop.setPosition(newPosition);
+		String actualPosition = bishop.getPosition();
+
 		// Assert
-		assertEquals(expectedOutput.trim(), outputStreamCaptor.toString().trim());
-		System.setOut(originalOut);
+		assertEquals(newPosition, actualPosition);
+	}
+
+	@Test
+	void testPieceToSvgString() {
+		// Arrange
+		Bishop bishop = new Bishop("black", "c4");
+		String expectedSvg = "" +
+				"<text x=\"140\" y=\"220\" dominant-baseline=\"middle\" fill=\"black\" font-size=\"40\" text-anchor=\"middle\">♝</text>";
+
+		// Act
+		String actualSvg = bishop.toSvgString();
+
+		// Assert
+		assertEquals(expectedSvg, actualSvg);
+	}
+
+	@Test
+	void testMakeMove() {
+		// Arrange
+		Board board = new Board();
+		String move = "e2e4";
+
+		// Act
+		board.makeMove(move);
+
+		// Act
+		assertEquals("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", board.toFenString());
+	}
+
+	@Test
+	void testToSvgString() {
+		// Arrange
+		Board board = new Board();
+		String move = "e2e4";
+
+		// Act
+		board.makeMove(move);
+
+		// Act
+		assertEquals("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", board.toSvgString());
 	}
 }
