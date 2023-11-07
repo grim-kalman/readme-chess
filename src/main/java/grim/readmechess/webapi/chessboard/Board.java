@@ -9,8 +9,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static grim.readmechess.utils.Utils.convertColumnToIndex;
+import static grim.readmechess.utils.Utils.convertRowToIndex;
+
 @Component
 public class Board {
+    public static final int SQUARE_SIZE = 40;
     private static final String LIGHT_COLOR = "#D8AF87";
     private static final String DARK_COLOR = "#B58863";
     private static final String SQUARE_TEMPLATE = "<rect x=\"%d\" y=\"%d\" width=\"40\" height=\"40\" fill=\"%s\"/>";
@@ -69,8 +73,8 @@ public class Board {
 
     private void placePieceOnBoard(String[][] board, Piece piece) {
         String position = piece.getPosition();
-        int col = Utils.convertColumnToIndex(position.charAt(0));
-        int row = Utils.convertRowToIndex(position.charAt(1));
+        int col = convertColumnToIndex(position.charAt(0));
+        int row = convertRowToIndex(position.charAt(1));
         board[row][col] = piece.getFenSymbol();
     }
 
@@ -99,27 +103,27 @@ public class Board {
                 printSquares(), printEdgeLabels(), printPieces());
     }
 
-    public String printEdgeLabels() {
+    private String printEdgeLabels() {
         StringBuilder stringBuilder = new StringBuilder(3340);
         for (char col = 'a'; col <= 'h'; col++) {
-            int x = 60 + 40 * (col - 'a');
+            int x = 60 + SQUARE_SIZE * (col - 'a');
             stringBuilder.append(String.format(EDGE_LABELS_TEMPLATE, x, 20, col));
             stringBuilder.append(String.format(EDGE_LABELS_TEMPLATE, x, 380, col));
         }
         for (int row = 1; row <= 8; row++) {
-            int y = 380 - 40 * (row);
+            int y = 380 - SQUARE_SIZE * (row);
             stringBuilder.append(String.format(EDGE_LABELS_TEMPLATE, 20, y, row));
             stringBuilder.append(String.format(EDGE_LABELS_TEMPLATE, 380, y, row));
         }
         return stringBuilder.toString();
     }
 
-    public String printSquares() {
+    private String printSquares() {
         StringBuilder stringBuilder = new StringBuilder(3872);
-        for (int row = 0; row < 8; row++) {
-            int y = 40 + 40 * row;
-            for (int col = 0; col < 8; col++) {
-                int x = 40 + 40 * col;
+        for (int row = 1; row <= 8; row++) {
+            int y = SQUARE_SIZE * row;
+            for (int col = 1; col <= 8; col++) {
+                int x = SQUARE_SIZE * col;
                 String color = (row + col) % 2 == 0 ? LIGHT_COLOR : DARK_COLOR;
                 stringBuilder.append(String.format(SQUARE_TEMPLATE, x, y, color));
             }
@@ -127,7 +131,7 @@ public class Board {
         return stringBuilder.toString();
     }
 
-    public String printPieces() {
+    private String printPieces() {
         return pieces.stream()
                 .map(Piece::toSvgString)
                 .collect(Collectors.joining());
