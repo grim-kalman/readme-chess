@@ -2,7 +2,11 @@ package grim.readmechess.webapi.chesspieces;
 
 import grim.readmechess.utils.Utils;
 
+import static grim.readmechess.webapi.chessboard.Board.SQUARE_SIZE;
+
 public abstract class Piece {
+    private final int OFFSET_X = 60;
+    private final int OFFSET_Y = 60;
     private final String color;
     private final String symbol;
     private final String fenSymbol;
@@ -30,8 +34,8 @@ public abstract class Piece {
     public String toSvgString() {
         int col = Utils.convertColumnToIndex(position.charAt(0));
         int row = Utils.convertRowToIndex(position.charAt(1));
-        String x = String.valueOf(60 + col * 40);
-        String y = String.valueOf(60 + row * 40);
+        String x = String.valueOf(OFFSET_X + col * SQUARE_SIZE);
+        String y = String.valueOf(OFFSET_Y + row * SQUARE_SIZE);
         return String.format(
                 "<text x=\"%s\" y=\"%s\" dominant-baseline=\"middle\" fill=\"%s\" font-size=\"40\" text-anchor=\"middle\">%s</text>",
                 x, y, color, symbol);
