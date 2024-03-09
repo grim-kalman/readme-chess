@@ -1,6 +1,5 @@
 package grim.readmechess.webapi.chessboard;
 
-import grim.readmechess.utils.Utils;
 import grim.readmechess.webapi.chesspieces.*;
 import org.springframework.stereotype.Component;
 
@@ -148,9 +147,9 @@ public class Board {
     }
 
     private void updateActiveColor() {
-        if ("b".equals(activeColor)) {
-            fullMoveNumber++;
+        if (activeColor.equals("b")) {
             activeColor = "w";
+            fullMoveNumber++;
         } else {
             activeColor = "b";
         }
