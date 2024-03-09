@@ -5,14 +5,14 @@ import grim.readmechess.utils.Utils;
 import static grim.readmechess.webapi.chessboard.Board.SQUARE_SIZE;
 
 public abstract class Piece {
-    private final int OFFSET_X = 60;
-    private final int OFFSET_Y = 60;
+    private static final int OFFSET_X = 60;
+    private static final int OFFSET_Y = 60;
     private final String color;
     private final String symbol;
     private final String fenSymbol;
     private String position;
 
-    public Piece(String color, String symbol, String fenSymbol, String position) {
+    protected Piece(String color, String symbol, String fenSymbol, String position) {
         this.color = color;
         this.symbol = symbol;
         this.fenSymbol = fenSymbol;
