@@ -155,6 +155,10 @@ public class Board {
         }
     }
 
+    private void updateCastlingRights(String move) {
+        
+    }
+
     private void resetEnPassantTarget() {
         enPassantTarget = "-";
     }
