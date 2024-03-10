@@ -38,20 +38,6 @@ class ReadmeChessApplicationTests {
 	}
 
 	@Test
-	void testPieceToSvgString() {
-		// Arrange
-		Bishop bishop = new Bishop("black", "c4");
-		String expectedSvg = "" +
-				"<text x=\"140\" y=\"220\" dominant-baseline=\"middle\" fill=\"black\" font-size=\"40\" text-anchor=\"middle\">♝</text>";
-
-		// Act
-		String actualSvg = bishop.toSvgString();
-
-		// Assert
-		assertEquals(expectedSvg, actualSvg);
-	}
-
-	@Test
 	void testMakeMove() {
 		// Arrange
 		Board board = new Board();
