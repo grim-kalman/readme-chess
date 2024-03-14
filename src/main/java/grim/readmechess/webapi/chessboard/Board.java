@@ -156,7 +156,13 @@ public class Board {
     }
 
     private void updateCastlingRights(String move) {
-        
+        if (move.matches("e1.*")) {
+            castlingAvailability = castlingAvailability.replace("K", "").replace("Q", "");
+        }
+        if (move.matches("e8.*")) {
+            castlingAvailability = castlingAvailability.replace("k", "").replace("q", "");
+        }
+
     }
 
     private void resetEnPassantTarget() {
