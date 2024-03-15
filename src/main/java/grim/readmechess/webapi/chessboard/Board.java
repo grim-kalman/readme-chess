@@ -139,9 +139,9 @@ public class Board {
     public void makeMove(String move) {
         updateActiveColor();
         resetEnPassantTarget();
-        // TODO: 2023-11-06  updateCastlingRights(move);
         String fromSquare = move.substring(0, 2);
         String toSquare = move.substring(2, 4);
+        updateCastlingRights(fromSquare);
         updateHalfMoveClock(toSquare);
         movePiece(fromSquare, toSquare);
     }
@@ -155,14 +155,18 @@ public class Board {
         }
     }
 
-    private void updateCastlingRights(String move) {
-        if (move.matches("e1.*")) {
-            castlingAvailability = castlingAvailability.replace("K", "").replace("Q", "");
+    private void updateCastlingRights(String fromSquare) {
+        switch (fromSquare) {
+            case "e1" -> castlingAvailability = castlingAvailability.replace("K", "").replace("Q", "");
+            case "e8" -> castlingAvailability = castlingAvailability.replace("k", "").replace("q", "");
+            case "a1" -> castlingAvailability = castlingAvailability.replace("Q", "");
+            case "h1" -> castlingAvailability = castlingAvailability.replace("K", "");
+            case "a8" -> castlingAvailability = castlingAvailability.replace("q", "");
+            case "h8" -> castlingAvailability = castlingAvailability.replace("k", "");
+            default -> {
+                // No action
+            }
         }
-        if (move.matches("e8.*")) {
-            castlingAvailability = castlingAvailability.replace("k", "").replace("q", "");
-        }
-
     }
 
     private void resetEnPassantTarget() {
