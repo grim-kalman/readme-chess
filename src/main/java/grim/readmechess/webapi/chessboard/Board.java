@@ -4,12 +4,9 @@ import grim.readmechess.webapi.chesspieces.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static grim.readmechess.utils.Utils.convertColumnToIndex;
-import static grim.readmechess.utils.Utils.convertRowToIndex;
 
 @Component
 public class Board {
@@ -35,6 +32,30 @@ public class Board {
         this.fullMoveNumber = 1;
     }
 
+    public List<Piece> getPieces() {
+        return pieces;
+    }
+
+    public String getActiveColor() {
+        return activeColor;
+    }
+
+    public String getCastlingAvailability() {
+        return castlingAvailability;
+    }
+
+    public String getEnPassantTarget() {
+        return enPassantTarget;
+    }
+
+    public int getHalfMoveClock() {
+        return halfMoveClock;
+    }
+
+    public int getFullMoveNumber() {
+        return fullMoveNumber;
+    }
+
     private List<Piece> setupStartingPosition() {
         List<Piece> startingPieces = new ArrayList<>();
         startingPieces.add(new King("white", "e1"));
@@ -58,43 +79,6 @@ public class Board {
             startingPieces.add(new Pawn("black", "" + col + '7'));
         }
         return startingPieces;
-    }
-
-    public String toFenString() {
-        String[][] board = new String[8][8];
-        pieces.forEach(piece -> placePieceOnBoard(board, piece));
-        String boardFen = Arrays.stream(board)
-                .map(this::processRowForFen)
-                .collect(Collectors.joining("/"));
-        return String.format("%s %s %s %s %d %d",
-                boardFen, activeColor, castlingAvailability, enPassantTarget, halfMoveClock, fullMoveNumber);
-    }
-
-    private void placePieceOnBoard(String[][] board, Piece piece) {
-        String position = piece.getPosition();
-        int col = convertColumnToIndex(position.charAt(0));
-        int row = convertRowToIndex(position.charAt(1));
-        board[row][col] = piece.getFenSymbol();
-    }
-
-    private String processRowForFen(String[] row) {
-        StringBuilder rowFen = new StringBuilder();
-        int emptySquares = 0;
-        for (String square : row) {
-            if (square == null) {
-                emptySquares++;
-            } else {
-                if (emptySquares > 0) {
-                    rowFen.append(emptySquares);
-                    emptySquares = 0;
-                }
-                rowFen.append(square);
-            }
-        }
-        if (emptySquares > 0) {
-            rowFen.append(emptySquares);
-        }
-        return rowFen.toString();
     }
 
     public String toSvgString() {

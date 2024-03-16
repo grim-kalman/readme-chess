@@ -36,30 +36,4 @@ class ReadmeChessApplicationTests {
 		// Assert
 		assertEquals(newPosition, actualPosition);
 	}
-
-	@Test
-	void testMakeMove() {
-		// Arrange
-		Board board = new Board();
-		String move = "e2e4";
-
-		// Act
-		board.makeMove(move);
-
-		// Act
-		assertEquals("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", board.toFenString());
-	}
-
-	@Test
-	void testToSvgString() {
-		// Arrange
-		Board board = new Board();
-		String move = "e2e4";
-
-		// Act
-		board.makeMove(move);
-
-		// Act
-		assertEquals("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", board.toSvgString());
-	}
 }
