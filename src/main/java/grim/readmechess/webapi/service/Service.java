@@ -1,6 +1,6 @@
 package grim.readmechess.webapi.service;
 
-import grim.readmechess.webapi.chessboard.Board;
+import grim.readmechess.webapi.service.chessboard.Board;
 
 @org.springframework.stereotype.Service
 public class Service {

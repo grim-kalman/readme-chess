@@ -1,10 +1,13 @@
 package grim.readmechess.webapi.chessboard;
 
-import grim.readmechess.webapi.chesspieces.Piece;
+import grim.readmechess.webapi.service.chesspieces.Piece;
+import grim.readmechess.webapi.service.chessboard.Board;
+import grim.readmechess.webapi.service.chessboard.BoardPrinter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,11 +24,11 @@ class BoardPrinterTest {
     }
 
     @Test
-    void printFENReturnsCorrectFENString() {
+    void printFENReturnsCorrectFENForNonEmptyBoard() {
         Piece piece = Mockito.mock(Piece.class);
         when(piece.getPosition()).thenReturn("e1");
         when(piece.getFenSymbol()).thenReturn("K");
-        when(board.getPieces()).thenReturn(List.of(piece));
+        when(board.getPieces()).thenReturn(Arrays.asList(piece));
         when(board.getActiveColor()).thenReturn("w");
         when(board.getCastlingAvailability()).thenReturn("KQkq");
         when(board.getEnPassantTarget()).thenReturn("-");
@@ -39,7 +42,7 @@ class BoardPrinterTest {
     }
 
     @Test
-    void printFENHandlesEmptyBoard() {
+    void printFENReturnsCorrectFENForEmptyBoard() {
         when(board.getPieces()).thenReturn(List.of());
         when(board.getActiveColor()).thenReturn("w");
         when(board.getCastlingAvailability()).thenReturn("KQkq");

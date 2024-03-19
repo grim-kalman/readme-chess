@@ -1,8 +1,8 @@
-package grim.readmechess.webapi.chesspieces;
+package grim.readmechess.webapi.service.chesspieces;
 
 import grim.readmechess.utils.Utils;
 
-import static grim.readmechess.webapi.chessboard.Board.SQUARE_SIZE;
+import static grim.readmechess.webapi.service.chessboard.Board.SQUARE_SIZE;
 
 public abstract class Piece {
     private static final int OFFSET_X = 60;
