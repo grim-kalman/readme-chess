@@ -1,14 +1,17 @@
 package grim.readmechess.webapi.service;
 
 import grim.readmechess.webapi.service.chessboard.Board;
+import grim.readmechess.webapi.service.chessboard.BoardPrinter;
 
 @org.springframework.stereotype.Service
 public class Service {
 
     private final Board board;
+    private final BoardPrinter boardPrinter;
 
     public Service(Board board) {
         this.board = board;
+        this.boardPrinter = new BoardPrinter(board);
     }
 
     public void makeMove(String move) {

@@ -2,6 +2,7 @@ package grim.readmechess.webapi.service.chesspieces;
 
 import grim.readmechess.utils.Utils;
 
+import static grim.readmechess.utils.Constants.WHITE;
 import static grim.readmechess.webapi.service.chessboard.Board.SQUARE_SIZE;
 
 public abstract class Piece {
@@ -36,8 +37,9 @@ public abstract class Piece {
         int row = Utils.convertRowToIndex(position.charAt(1));
         String x = String.valueOf(OFFSET_X + col * SQUARE_SIZE);
         String y = String.valueOf(OFFSET_Y + row * SQUARE_SIZE);
+        String pieceColor = this.color.equals(WHITE) ? "white" : "black";
         return String.format(
                 "<text x=\"%s\" y=\"%s\" dominant-baseline=\"middle\" fill=\"%s\" font-size=\"36\" text-anchor=\"middle\">%s</text>",
-                x, y, color, symbol);
+                x, y, pieceColor, symbol);
     }
 }

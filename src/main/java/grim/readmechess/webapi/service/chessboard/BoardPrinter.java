@@ -32,11 +32,11 @@ public class BoardPrinter {
 
         return String.format("%s %s %s %s %d %d",
                 boardFen,
-                board.getActiveColor(),
-                board.getCastlingAvailability(),
-                board.getEnPassantTarget(),
-                board.getHalfMoveClock(),
-                board.getFullMoveNumber());
+                board.getBoardState().getActiveColor(),
+                board.getBoardState().getCastlingAvailability(),
+                board.getBoardState().getEnPassantTarget(),
+                board.getBoardState().getHalfMoveClock(),
+                board.getBoardState().getFullMoveNumber());
     }
 
     private void updateBoardRepresentation(String[][] boardRepresentation, Piece piece) {
