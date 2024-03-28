@@ -1,8 +1,5 @@
 package grim.readmechess.webapi.model.chessboard;
 
-import grim.readmechess.webapi.model.chessboard.Board;
-import grim.readmechess.webapi.model.chessboard.BoardPrinter;
-import grim.readmechess.webapi.model.chessboard.BoardState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
