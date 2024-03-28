@@ -2,7 +2,7 @@ package grim.readmechess.webapi.service.controllerservice;
 
 import grim.readmechess.webapi.model.chessboard.Board;
 import grim.readmechess.webapi.model.chessboard.BoardState;
-import grim.readmechess.webapi.service.controllerservice.ControllerService;
+import grim.readmechess.webapi.service.engineservice.EngineService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,9 +13,9 @@ class ControllerServiceTest {
     private ControllerService controllerService;
 
     @BeforeEach
-    public void setup() {
+    public void setUp() {
         Board board = new Board(new BoardState());
-        controllerService = new ControllerService(board);
+        controllerService = new ControllerService(board, new EngineService());
     }
 
     @Test

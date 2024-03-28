@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import grim.readmechess.webapi.model.chessboard.Board;
 import grim.readmechess.webapi.model.chessboard.BoardPrinter;
 import grim.readmechess.webapi.dto.EngineResponseDTO;
+import grim.readmechess.webapi.service.engineservice.EngineService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,13 +17,15 @@ public class ControllerService {
 
     final Board board;
     final BoardPrinter boardPrinter;
+    final EngineService engineService;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private static final Logger log = LoggerFactory.getLogger(ControllerService.class);
 
-    public ControllerService(Board board) {
+    public ControllerService(Board board, EngineService engineService) {
         this.board = board;
         this.boardPrinter = new BoardPrinter(board);
+        this.engineService = engineService;
         this.restTemplate = new RestTemplate();
         this.objectMapper = new ObjectMapper();
     }
@@ -32,7 +35,7 @@ public class ControllerService {
         //1. MakeMove
         board.makeMove(playerMove);
 
-        //2. Get best move from API or Stockfish and do it asynchronously?
+        //2. Stockfish and do it asynchronously?
         String engineMove = getMoveFromEngine(boardPrinter.printFEN());
 
         //3. MakeMove Update board state
