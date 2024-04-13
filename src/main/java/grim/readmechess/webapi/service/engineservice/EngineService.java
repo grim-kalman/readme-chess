@@ -7,53 +7,50 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.Optional;
 
 @Service
 public class EngineService {
     private Process engineProcess;
     private BufferedReader output;
     private PrintWriter input;
-    private final Object lock = new Object();
 
-    public synchronized void startEngine(String pathToEngine) throws IOException, InterruptedException, EngineServiceException {
+    public void startEngine(String pathToEngine) throws IOException, EngineServiceException {
         ProcessBuilder processBuilder = new ProcessBuilder(pathToEngine);
         engineProcess = processBuilder.start();
         output = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
         input = new PrintWriter(engineProcess.getOutputStream(), true);
+        if (!isEngineReady()) {
+            throw new EngineServiceException("Engine failed to respond with 'readyok' during startup");
+        }
+    }
 
+    private boolean isEngineReady() throws EngineServiceException {
+        sendCommand("isready\n");
         try {
-            waitForEngine();
+            boolean ready = readEngineOutput("readyok", 100).isPresent();
+            if (!ready) {
+                throw new EngineServiceException("Engine did not become ready within the expected time.");
+            }
+            return ready;
         } catch (IOException e) {
-            throw new EngineServiceException("Engine failed to respond with 'readyok' during startup", e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new EngineServiceException("Thread was interrupted during engine startup", e);
+            throw new EngineServiceException("IO error while checking if the engine is ready: " + e.getMessage());
         }
     }
 
     public void sendCommand(String command) {
-        synchronized (lock) {
-            System.out.println("DEBUG: Sending command: " + command);  // Log command
-            input.write(command);
-            input.flush();
-        }
+        input.println(command);
+        input.flush();
     }
 
-    private void waitForEngine() throws IOException, InterruptedException {
-        sendCommand("isready\n");
-        String response;
-        while (true) {
-            response = output.readLine();
-            System.out.println("DEBUG: Waiting for 'readyok', got: " + response);  // Log responses during wait
-            if (response.equals("readyok")) {
-                break;
-            }
-            Thread.sleep(10);
+    public void stopEngine() throws EngineServiceException {
+        try {
+            output.close();
+            input.close();
+            engineProcess.destroy();
+        } catch (IOException e) {
+            throw new EngineServiceException("Failed to gracefully shutdown the engine: " + e.getMessage());
         }
-    }
-
-    public void stopEngine() {
-        engineProcess.destroy();
     }
 
     public EngineResponseDTO getEngineResponse(long timeoutMillis) throws EngineServiceException {
@@ -61,35 +58,36 @@ public class EngineService {
             String bestMove = getBestMove(timeoutMillis);
             Double evaluation = getEvaluation(timeoutMillis);
             return new EngineResponseDTO(bestMove, evaluation);
-        } catch (IOException | InterruptedException e) {
-            throw new EngineServiceException("Failed to get response from engine within the specified timeout", e);
+        } catch (IOException e) {
+            throw new EngineServiceException("Failed to get response from engine within the specified timeout: " + e.getMessage());
         }
     }
 
-    public synchronized String getBestMove(long timeoutMillis) throws IOException, InterruptedException {
+    String getBestMove(long timeoutMillis) throws IOException, EngineServiceException {
         sendCommand("go depth 16\n");
-        return readEngineOutput("bestmove", timeoutMillis).split(" ")[1];
+        return readEngineOutput("bestmove", timeoutMillis)
+                .map(line -> line.split(" ")[1])
+                .orElseThrow(() -> new EngineServiceException("Best move not found"));
     }
 
-    public synchronized Double getEvaluation(long timeoutMillis) throws IOException, InterruptedException {
+    Double getEvaluation(long timeoutMillis) throws IOException, EngineServiceException {
         sendCommand("eval\n");
-        return Double.valueOf(readEngineOutput("NNUE evaluation", timeoutMillis).split(" ")[2]);
+        return readEngineOutput("NNUE evaluation", timeoutMillis)
+                .map(line -> line.replaceAll("[^0-9.-]", ""))
+                .map(Double::parseDouble)
+                .orElseThrow(() -> new EngineServiceException("Evaluation not found"));
     }
 
-    private String readEngineOutput(String expectedOutputStart, long timeoutMillis) throws IOException, InterruptedException {
+    private Optional<String> readEngineOutput(String expectedOutputStart, long timeoutMillis) throws IOException {
         String line;
+
         long startTime = System.currentTimeMillis();
         while ((System.currentTimeMillis() - startTime) < timeoutMillis) {
-            if (output.ready()) {  // Check if there's something to read
-                line = output.readLine();
-                System.out.println("DEBUG: Read line: " + line);  // Print out each line read from the CLI
-                if (line != null && line.startsWith(expectedOutputStart)) {
-                    System.out.println("DEBUG: Found expected start: " + line);  // Indicate when the expected line is found
-                    return line;
-                }
+            line = output.readLine();
+            if (line != null && line.startsWith(expectedOutputStart)) {
+                return Optional.of(line);
             }
-            Thread.sleep(10); // Sleep to avoid high CPU usage
         }
-        throw new IOException("Engine did not respond with the expected output '" + expectedOutputStart +"' within the timeout: " + timeoutMillis + "ms");
+        return Optional.empty();
     }
 }
