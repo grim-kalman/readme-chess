@@ -5,10 +5,12 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EngineServiceTest {
     private EngineService engineService;
+    private String pathToEngine = "src/main/resources/stockfish.exe";
 
     @BeforeEach
     void setUp() {
@@ -16,12 +18,32 @@ class EngineServiceTest {
     }
 
     @Test
-    void startEngine() throws IOException {
-        String pathToEngine = "src/main/resources/stockfish.exe";
-        engineService.startEngine(pathToEngine);
-        engineService.sendCommand("isready");
-        String output = engineService.getEngineOutput();
-        assertTrue(output.contains("readyok"));
-        engineService.stopEngine();
+    void shouldStartEngine() {
+        try {
+            engineService.startEngine(pathToEngine);
+        } catch (IOException | InterruptedException | EngineServiceException e) {
+            fail("Failed to start engine");
+        }
+    }
+
+    @Test
+    void shouldStopEngine() {
+        try {
+            engineService.startEngine(pathToEngine);
+            engineService.stopEngine();
+        } catch (IOException | InterruptedException | EngineServiceException e) {
+            fail("Failed to stop engine");
+        }
+    }
+
+    @Test
+    void shouldGetBestMove() {
+        try {
+            engineService.startEngine(pathToEngine);
+            String bestMove = engineService.getBestMove(1000);
+            assertNotNull(bestMove);
+        } catch (IOException | InterruptedException | EngineServiceException e) {
+            fail("Failed to get best move", e);
+        }
     }
 }
