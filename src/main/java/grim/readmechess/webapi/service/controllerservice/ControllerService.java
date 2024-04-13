@@ -36,10 +36,8 @@ public class ControllerService {
         board.makeMove(playerMove);
 
         //2. Stockfish and do it asynchronously?
-        String engineMove = getMoveFromEngine(boardPrinter.printFEN());
 
         //3. MakeMove Update board state
-        board.makeMove(engineMove);
 
         //4. Get all possible moves from the new position
 
@@ -49,16 +47,6 @@ public class ControllerService {
 
     }
 
-    String getMoveFromEngine(String fen) {
-        String url = String.format("https://stockfish.online/api/s/v2.php?fen=%s&depth=15", fen);
-        try {
-            String response = restTemplate.getForObject(url, String.class);
-            EngineResponseDTO engineResponse = objectMapper.readValue(response, EngineResponseDTO.class);
-            return engineResponse.bestmove().split(" ")[1];
-        } catch (RestClientException | JsonProcessingException e) {
-            log.error("Error fetching data from the engine: ", e);
-            return null;
-        }
-    }
+
 
 }

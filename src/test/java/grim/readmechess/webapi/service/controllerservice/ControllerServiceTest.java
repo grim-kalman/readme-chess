@@ -4,6 +4,7 @@ import grim.readmechess.webapi.model.chessboard.Board;
 import grim.readmechess.webapi.model.chessboard.BoardState;
 import grim.readmechess.webapi.service.engineservice.EngineService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,6 +19,7 @@ class ControllerServiceTest {
         controllerService = new ControllerService(board, new EngineService());
     }
 
+    /*
     @Test
     void getMoveFromEngineReturnsBestMove() {
         String fen = "rnbqkbnr/pp3ppp/8/2pPp3/8/5N2/PPPP1PPP/RNBQKB1R w KQkq c6 0 4";
@@ -32,4 +34,5 @@ class ControllerServiceTest {
         String actualFen = controllerService.boardPrinter.printFEN();
         assertEquals(expectedFen, actualFen);
     }
+    */
 }
