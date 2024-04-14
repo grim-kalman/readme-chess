@@ -63,14 +63,14 @@ public class EngineService {
         }
     }
 
-    String getBestMove(long timeoutMillis) throws IOException, EngineServiceException {
+    public String getBestMove(long timeoutMillis) throws IOException, EngineServiceException {
         sendCommand("go depth 16\n");
         return readEngineOutput("bestmove", timeoutMillis)
                 .map(line -> line.split(" ")[1])
                 .orElseThrow(() -> new EngineServiceException("Best move not found"));
     }
 
-    Double getEvaluation(long timeoutMillis) throws IOException, EngineServiceException {
+    public Double getEvaluation(long timeoutMillis) throws IOException, EngineServiceException {
         sendCommand("eval\n");
         return readEngineOutput("NNUE evaluation", timeoutMillis)
                 .map(line -> line.replaceAll("[^0-9.-]", ""))

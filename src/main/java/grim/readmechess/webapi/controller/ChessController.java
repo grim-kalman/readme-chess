@@ -18,7 +18,7 @@ public class ChessController {
     public ResponseEntity<String> getSelectedSquare(@RequestParam String move) {
 
         //1. send the request to the service layer to handle the move
-        controllerService.makeMove(move);
+        //controllerService.makeMove(move);
         //2. when done return a redirect back to the website
 
         return ResponseEntity.ok(move);

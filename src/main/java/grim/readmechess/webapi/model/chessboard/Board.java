@@ -29,7 +29,7 @@ public class Board {
         return boardState;
     }
 
-    private List<Piece> setupStartingPosition() {
+    List<Piece> setupStartingPosition() {
         List<Piece> startingPieces = new ArrayList<>();
         addKings(startingPieces);
         addQueens(startingPieces);
