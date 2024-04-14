@@ -1,6 +1,7 @@
 package grim.readmechess.webapi.model.chessboard;
 
 import grim.readmechess.webapi.model.chesspieces.Piece;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -9,6 +10,7 @@ import static grim.readmechess.utils.Utils.convertColumnToIndex;
 import static grim.readmechess.utils.Utils.convertRowToIndex;
 import static grim.readmechess.webapi.model.chessboard.Board.SQUARE_SIZE;
 
+@Component
 public class BoardPrinter {
     private static final String LIGHT_COLOR = "#D8AF87";
     private static final String DARK_COLOR = "#B58863";

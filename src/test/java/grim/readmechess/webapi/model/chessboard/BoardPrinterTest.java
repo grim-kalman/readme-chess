@@ -1,21 +1,21 @@
 package grim.readmechess.webapi.model.chessboard;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class BoardPrinterTest {
 
+    @Autowired
     private Board board;
-    private BoardPrinter boardPrinter;
 
-    @BeforeEach
-    void setUp() {
-        BoardState boardState = new BoardState();
-        board = new Board(boardState);
-        boardPrinter = new BoardPrinter(board);
-    }
+    @Autowired
+    private BoardPrinter boardPrinter;
 
     @Test
     void shouldPrintStartFEN() {
