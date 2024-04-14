@@ -1,5 +1,6 @@
 package grim.readmechess.webapi.service.controllerservice;
 
+import grim.readmechess.webapi.dto.EngineResponseDTO;
 import grim.readmechess.webapi.model.chessboard.Board;
 import grim.readmechess.webapi.model.chessboard.BoardPrinter;
 import grim.readmechess.webapi.service.engineservice.EngineService;
@@ -28,11 +29,21 @@ public class ControllerService {
         }
     }
 
-    public String getMoveFromEngine() throws ControllerServiceException {
+    public String makeMove(String playerMove) throws ControllerServiceException {
+        board.makeMove(playerMove);
+        engineService.updateEngineState(boardPrinter.printFEN());
+
+        EngineResponseDTO engineResponse = getEngineResponse();
+        board.makeMove(engineResponse.bestMove());
+
+        return boardPrinter.printSVG();
+    }
+
+    public EngineResponseDTO getEngineResponse() throws ControllerServiceException {
         try {
-            return engineService.getBestMove(1000);
-        } catch (IOException | EngineServiceException e) {
-            throw new ControllerServiceException("Error getting move from engine", e);
+            return engineService.getEngineResponse(1000);
+        } catch (EngineServiceException e) {
+            throw new ControllerServiceException("Error getting response from engine", e);
         }
     }
 }
