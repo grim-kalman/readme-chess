@@ -13,8 +13,8 @@ import static grim.readmechess.utils.Constants.WHITE;
 public class Board {
     public static final int SQUARE_SIZE = 40;
 
-    private List<Piece> pieces;
-    private BoardState boardState;
+    private final List<Piece> pieces;
+    private final BoardState boardState;
 
     public Board(BoardState boardState) {
         this.pieces = setupStartingPosition();

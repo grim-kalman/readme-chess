@@ -1,10 +1,6 @@
 package grim.readmechess.webapi.service.controllerservice;
 
-import grim.readmechess.webapi.model.chessboard.Board;
-import grim.readmechess.webapi.model.chessboard.BoardPrinter;
-import grim.readmechess.webapi.model.chessboard.BoardState;
-import grim.readmechess.webapi.service.engineservice.EngineService;
-import org.junit.jupiter.api.BeforeEach;
+import grim.readmechess.webapi.dto.EngineResponseDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,8 +14,7 @@ class ControllerServiceTest {
     private ControllerService controllerService;
 
     @Test
-    void getMoveFromEngineReturnsExpectedMove() throws ControllerServiceException {
-        String move = controllerService.getMoveFromEngine();
-        assertEquals("e2e4", move);
+    void shouldGetEngineResponse() throws ControllerServiceException {
+        assertEquals(new EngineResponseDTO("e2e4", 0.09), controllerService.getEngineResponse());
     }
 }

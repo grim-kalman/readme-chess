@@ -53,6 +53,10 @@ public class EngineService {
         }
     }
 
+    public void updateEngineState(String FEN) {
+        sendCommand("position fen " + FEN + "\n");
+    }
+
     public EngineResponseDTO getEngineResponse(long timeoutMillis) throws EngineServiceException {
         try {
             String bestMove = getBestMove(timeoutMillis);
@@ -63,14 +67,14 @@ public class EngineService {
         }
     }
 
-    public String getBestMove(long timeoutMillis) throws IOException, EngineServiceException {
+    String getBestMove(long timeoutMillis) throws IOException, EngineServiceException {
         sendCommand("go depth 16\n");
         return readEngineOutput("bestmove", timeoutMillis)
                 .map(line -> line.split(" ")[1])
                 .orElseThrow(() -> new EngineServiceException("Best move not found"));
     }
 
-    public Double getEvaluation(long timeoutMillis) throws IOException, EngineServiceException {
+    Double getEvaluation(long timeoutMillis) throws IOException, EngineServiceException {
         sendCommand("eval\n");
         return readEngineOutput("NNUE evaluation", timeoutMillis)
                 .map(line -> line.replaceAll("[^0-9.-]", ""))
