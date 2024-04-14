@@ -43,4 +43,14 @@ class BoardTest {
                 .orElse(null);
         assertEquals("e4", movedPiece.getPosition());
     }
+
+    @Test
+    void shouldMakeMove() {
+        String move = "e2e4";
+        BoardPrinter boardPrinter = new BoardPrinter(board);
+        board.makeMove(move);
+        String expectedFen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
+        String actualFen = boardPrinter.printFEN();
+        assertEquals(expectedFen, actualFen);
+    }
 }

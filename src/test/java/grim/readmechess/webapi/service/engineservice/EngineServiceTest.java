@@ -6,12 +6,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EngineServiceTest {
     private EngineService engineService;
-    private String pathToEngine = "src/main/resources/stockfish.exe";
+    private final String pathToEngine = "src/main/resources/stockfish.exe";
 
     @BeforeEach
     void setUp() {
