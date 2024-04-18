@@ -24,7 +24,7 @@ public class ControllerService {
         this.engineService = engineService;
         try {
             this.engineService.startEngine(PATH_TO_ENGINE);
-        } catch (IOException | EngineServiceException e) {
+        } catch (IOException e) {
             throw new ControllerServiceException("Error starting engine service", e);
         }
     }
@@ -35,13 +35,13 @@ public class ControllerService {
 
         EngineResponseDTO engineResponse = getEngineResponse();
         board.makeMove(engineResponse.bestMove());
-
+        engineService.updateEngineState(boardPrinter.printFEN());
         return boardPrinter.printSVG();
     }
 
     public EngineResponseDTO getEngineResponse() throws ControllerServiceException {
         try {
-            return engineService.getEngineResponse(1000);
+            return engineService.getEngineResponse();
         } catch (EngineServiceException e) {
             throw new ControllerServiceException("Error getting response from engine", e);
         }
