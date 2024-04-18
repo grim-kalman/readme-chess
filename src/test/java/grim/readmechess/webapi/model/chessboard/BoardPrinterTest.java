@@ -23,6 +23,8 @@ class BoardPrinterTest {
         assertEquals("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", fen);
     }
 
+    // TODO: Debug the test case below, most likely connected with the update state to engine
+
     @Test
     void shouldPrintUpdatedFEN() {
         board.makeMove("e2e4");

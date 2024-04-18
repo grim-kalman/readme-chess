@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -15,27 +16,12 @@ public class EngineService {
     private BufferedReader output;
     private PrintWriter input;
 
-    public void startEngine(String pathToEngine) throws IOException, EngineServiceException {
+    public void startEngine(String pathToEngine) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder(pathToEngine);
         engineProcess = processBuilder.start();
         output = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
         input = new PrintWriter(engineProcess.getOutputStream(), true);
-        if (!isEngineReady()) {
-            throw new EngineServiceException("Engine failed to respond with 'readyok' during startup");
-        }
-    }
 
-    private boolean isEngineReady() throws EngineServiceException {
-        sendCommand("isready\n");
-        try {
-            boolean ready = readEngineOutput("readyok", 100).isPresent();
-            if (!ready) {
-                throw new EngineServiceException("Engine did not become ready within the expected time.");
-            }
-            return ready;
-        } catch (IOException e) {
-            throw new EngineServiceException("IO error while checking if the engine is ready: " + e.getMessage());
-        }
     }
 
     public void sendCommand(String command) {
@@ -53,45 +39,45 @@ public class EngineService {
         }
     }
 
-    public void updateEngineState(String FEN) {
-        sendCommand("position fen " + FEN + "\n");
+    public void updateEngineState(String fen) {
+        sendCommand("position fen " + fen + "\n");
     }
 
-    public EngineResponseDTO getEngineResponse(long timeoutMillis) throws EngineServiceException {
-        try {
-            String bestMove = getBestMove(timeoutMillis);
-            Double evaluation = getEvaluation(timeoutMillis);
-            return new EngineResponseDTO(bestMove, evaluation);
-        } catch (IOException e) {
-            throw new EngineServiceException("Failed to get response from engine within the specified timeout: " + e.getMessage());
-        }
+    public EngineResponseDTO getEngineResponse() throws EngineServiceException {
+        String bestMove = getBestMove();
+        Double evaluation = getEvaluation();
+        return new EngineResponseDTO(bestMove, evaluation);
     }
 
-    String getBestMove(long timeoutMillis) throws IOException, EngineServiceException {
+    String getBestMove() throws EngineServiceException {
         sendCommand("go depth 16\n");
-        return readEngineOutput("bestmove", timeoutMillis)
+        return readEngineOutput("bestmove")
                 .map(line -> line.split(" ")[1])
                 .orElseThrow(() -> new EngineServiceException("Best move not found"));
     }
 
-    Double getEvaluation(long timeoutMillis) throws IOException, EngineServiceException {
+    Double getEvaluation() throws EngineServiceException {
         sendCommand("eval\n");
-        return readEngineOutput("NNUE evaluation", timeoutMillis)
+
+        return readEngineOutput("NNUE evaluation")
                 .map(line -> line.replaceAll("[^0-9.-]", ""))
                 .map(Double::parseDouble)
                 .orElseThrow(() -> new EngineServiceException("Evaluation not found"));
     }
 
-    private Optional<String> readEngineOutput(String expectedOutputStart, long timeoutMillis) throws IOException {
-        String line;
+    public Optional<List<String>> getValidMoves() {
+        sendCommand("go perft 1\n");
 
-        long startTime = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - startTime) < timeoutMillis) {
-            line = output.readLine();
-            if (line != null && line.startsWith(expectedOutputStart)) {
-                return Optional.of(line);
-            }
-        }
-        return Optional.empty();
+        return Optional.of(output.lines()
+                .takeWhile(line -> !line.isBlank())
+                .filter(line -> line.contains(":"))
+                .map(line -> line.split(":")[0])
+                .toList());
+    }
+
+    private Optional<String> readEngineOutput(String expectedOutputStart) {
+        return output.lines()
+                .filter(line -> line.startsWith(expectedOutputStart))
+                .findFirst();
     }
 }

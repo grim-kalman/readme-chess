@@ -1,6 +1,7 @@
 package grim.readmechess.webapi.model.chessboard;
 
 import grim.readmechess.webapi.model.chesspieces.*;
+import grim.readmechess.webapi.validator.MoveValidator;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -13,20 +14,22 @@ import static grim.readmechess.utils.Constants.WHITE;
 public class Board {
     public static final int SQUARE_SIZE = 40;
 
-    private final List<Piece> pieces;
     private final BoardState boardState;
+    private final List<Piece> pieces;
+    private final MoveValidator moveValidator;
 
-    public Board(BoardState boardState) {
-        this.pieces = setupStartingPosition();
+    public Board(BoardState boardState, MoveValidator moveValidator) {
         this.boardState = boardState;
-    }
-
-    public List<Piece> getPieces() {
-        return pieces;
+        this.pieces = setupStartingPosition();
+        this.moveValidator = moveValidator;
     }
 
     public BoardState getBoardState() {
         return boardState;
+    }
+
+    public List<Piece> getPieces() {
+        return pieces;
     }
 
     List<Piece> setupStartingPosition() {
@@ -79,10 +82,14 @@ public class Board {
     }
 
     public void makeMove(String move) {
-        String fromSquare = move.substring(0, 2);
-        String toSquare = move.substring(2, 4);
-        updateBoardState(fromSquare, toSquare);
-        movePiece(fromSquare, toSquare);
+        if (moveValidator.isValidMove(move)) {
+            String fromSquare = move.substring(0, 2);
+            String toSquare = move.substring(2, 4);
+            updateBoardState(fromSquare, toSquare);
+            movePiece(fromSquare, toSquare);
+        } else {
+            throw new IllegalArgumentException("Invalid move: " + move);
+        }
     }
 
     private void updateBoardState(String fromSquare, String toSquare) {
