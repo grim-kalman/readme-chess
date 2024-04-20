@@ -66,8 +66,7 @@ public class EngineService {
         sendCommand("go perft 1\n");
 
         return Optional.of(output.lines()
-                .peek(System.out::println)
-                .takeWhile(line -> !line.isBlank())
+                .takeWhile(line -> !line.startsWith("Nodes searched"))
                 .filter(line -> line.contains(":"))
                 .map(line -> line.split(":")[0])
                 .toList());
