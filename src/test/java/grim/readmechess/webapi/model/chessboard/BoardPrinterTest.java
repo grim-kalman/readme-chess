@@ -27,7 +27,9 @@ class BoardPrinterTest {
 
     @Test
     void shouldPrintUpdatedFEN() {
+        System.out.println("making move: e2e4");
         board.makeMove("e2e4");
+        System.out.println("making move: e7e5");
         board.makeMove("e7e5");
         board.makeMove("g1f3");
         board.makeMove("d7d5");

@@ -26,7 +26,6 @@ public class EngineService {
 
     public void sendCommand(String command) {
         input.println(command);
-        input.flush();
     }
 
     public void stopEngine() throws EngineServiceException {
@@ -44,9 +43,7 @@ public class EngineService {
     }
 
     public EngineResponseDTO getEngineResponse() throws EngineServiceException {
-        String bestMove = getBestMove();
-        Double evaluation = getEvaluation();
-        return new EngineResponseDTO(bestMove, evaluation);
+        return new EngineResponseDTO(getBestMove(), getEvaluation());
     }
 
     String getBestMove() throws EngineServiceException {
@@ -69,6 +66,7 @@ public class EngineService {
         sendCommand("go perft 1\n");
 
         return Optional.of(output.lines()
+                .peek(System.out::println)
                 .takeWhile(line -> !line.isBlank())
                 .filter(line -> line.contains(":"))
                 .map(line -> line.split(":")[0])
