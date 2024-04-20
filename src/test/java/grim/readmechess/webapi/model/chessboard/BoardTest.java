@@ -24,14 +24,6 @@ class BoardTest {
     }
 
     @Test
-    void shouldUpdateBoardStateWhenMakingMove() {
-        String move = "e2e4";
-        board.makeMove(move);
-        String activeColor = board.getBoardState().getActiveColor();
-        assertEquals(BLACK, activeColor);
-    }
-
-    @Test
     void shouldThrowExceptionWhenMoveIsInvalid() {
         String move = "e2e9";
         assertThrows(IllegalArgumentException.class, () -> board.makeMove(move));

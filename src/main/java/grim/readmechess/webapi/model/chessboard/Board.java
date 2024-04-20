@@ -82,7 +82,7 @@ public class Board {
     }
 
     public void makeMove(String move) {
-        if (moveValidator.isValidMove(move)) {
+        if (moveValidator.isValid(move)) {
             String fromSquare = move.substring(0, 2);
             String toSquare = move.substring(2, 4);
             updateBoardState(fromSquare, toSquare);

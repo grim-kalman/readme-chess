@@ -33,8 +33,7 @@ public class ControllerService {
         board.makeMove(playerMove);
         engineService.updateEngineState(boardPrinter.printFEN());
 
-        EngineResponseDTO engineResponse = getEngineResponse();
-        board.makeMove(engineResponse.bestMove());
+        board.makeMove(getEngineResponse().bestMove());
         engineService.updateEngineState(boardPrinter.printFEN());
         return boardPrinter.printSVG();
     }
