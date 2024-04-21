@@ -15,7 +15,7 @@ import static grim.readmechess.utils.Constants.PATH_TO_ENGINE;
 public class ControllerService {
 
     final Board board;
-    final BoardPrinter boardPrinter;
+    public final BoardPrinter boardPrinter;
     final EngineService engineService;
 
     public ControllerService(Board board, BoardPrinter boardPrinter, EngineService engineService) throws ControllerServiceException {
@@ -29,13 +29,12 @@ public class ControllerService {
         }
     }
 
-    public String makeMove(String playerMove) throws ControllerServiceException {
+    public void makeMove(String playerMove) throws ControllerServiceException {
         board.makeMove(playerMove);
         engineService.updateEngineState(boardPrinter.printFEN());
 
         board.makeMove(getEngineResponse().bestMove());
         engineService.updateEngineState(boardPrinter.printFEN());
-        return boardPrinter.printSVG();
     }
 
     public EngineResponseDTO getEngineResponse() throws ControllerServiceException {

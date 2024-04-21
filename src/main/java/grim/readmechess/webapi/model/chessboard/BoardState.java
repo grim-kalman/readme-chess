@@ -9,6 +9,7 @@ import static grim.readmechess.utils.Constants.*;
 
 @Component
 public class BoardState {
+
     private static final String INITIAL_CASTLING_AVAILABILITY = "KQkq";
     private static final String DEFAULT_EN_PASSANT_TARGET = "-";
     private static final int INITIAL_HALF_MOVE_CLOCK = 0;
