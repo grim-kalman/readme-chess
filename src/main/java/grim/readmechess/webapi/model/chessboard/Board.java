@@ -12,7 +12,6 @@ import static grim.readmechess.utils.Constants.WHITE;
 
 @Component
 public class Board {
-    public static final int SQUARE_SIZE = 40;
 
     private final BoardState boardState;
     private final List<Piece> pieces;
@@ -99,18 +98,16 @@ public class Board {
         boardState.updateHalfMoveClock(toSquare, pieces);
     }
 
-
-
     private void movePiece(String fromSquare, String toSquare) {
-        pieces.stream()
-                .filter(piece -> piece.getPosition().equals(fromSquare))
-                .findFirst()
-                .ifPresent(piece -> {
-                    piece.setPosition(toSquare);
-                    if (piece instanceof Pawn) {
-                        boardState.setHalfMoveClock(0);
-                        boardState.handleEnPassantTarget(fromSquare, toSquare);
-                    }
-                });
+        for (Piece piece : pieces) {
+            if (piece.getPosition().equals(fromSquare)) {
+                piece.setPosition(toSquare);
+                if (piece instanceof Pawn) {
+                    boardState.setHalfMoveClock(0);
+                    boardState.handleEnPassantTarget(fromSquare, toSquare);
+                }
+                break;
+            }
+        }
     }
 }

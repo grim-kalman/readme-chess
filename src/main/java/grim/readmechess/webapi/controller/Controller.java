@@ -3,7 +3,10 @@ package grim.readmechess.webapi.controller;
 import grim.readmechess.webapi.service.controllerservice.ControllerService;
 import grim.readmechess.webapi.service.controllerservice.ControllerServiceException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/chess")
@@ -17,11 +20,9 @@ public class Controller {
 
     @GetMapping("/play")
     public ResponseEntity<String> makeMove(@RequestParam String move) throws ControllerServiceException {
+        controllerService.makeMove(move);
 
-        //1. send the request to the service layer to handle the move
-        String updatedBoard = controllerService.makeMove(move);
-        //2. when done return a redirect back to the website
-
-        return ResponseEntity.ok(updatedBoard);
+        return ResponseEntity.ok(controllerService.boardPrinter.printMarkdown());
     }
+
 }
