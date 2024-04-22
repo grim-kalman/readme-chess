@@ -14,7 +14,7 @@ import static grim.readmechess.utils.Constants.PATH_TO_ENGINE;
 @Service
 public class ControllerService {
 
-    final Board board;
+    public final Board board;
     public final BoardPrinter boardPrinter;
     final EngineService engineService;
 

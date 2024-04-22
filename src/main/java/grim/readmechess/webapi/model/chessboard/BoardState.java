@@ -79,14 +79,18 @@ public class BoardState {
     }
 
     public void updateHalfMoveClock(String toSquare, List<Piece> pieces) {
-        halfMoveClock = pieces.stream()
-                .filter(piece -> piece.getPosition().equals(toSquare))
-                .findFirst()
-                .map(piece -> {
-                    pieces.remove(piece);
-                    return 0;
-                })
-                .orElse(halfMoveClock + 1);
+        boolean pieceFound = false;
+        for (Piece piece : pieces) {
+            if (piece.getPosition().equals(toSquare)) {
+                pieces.remove(piece);
+                halfMoveClock = 0;
+                pieceFound = true;
+                break;
+            }
+        }
+        if (!pieceFound) {
+            halfMoveClock += 1;
+        }
     }
 
     public void handleEnPassantTarget(String fromSquare, String toSquare) {

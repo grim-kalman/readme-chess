@@ -16,11 +16,37 @@ public class Board {
     private final BoardState boardState;
     private final List<Piece> pieces;
     private final MoveValidator moveValidator;
+    private String selectedSquare;
 
     public Board(BoardState boardState, MoveValidator moveValidator) {
         this.boardState = boardState;
         this.pieces = setupStartingPosition();
         this.moveValidator = moveValidator;
+    }
+
+    public void selectSquare(String square) {
+        if (square.equals(this.selectedSquare)) {
+            this.selectedSquare = null;
+        } else {
+            this.selectedSquare = square;
+        }
+    }
+
+    public String getSelectedSquare() {
+        return selectedSquare;
+    }
+
+    public void setSelectedSquare(String selectedSquare) {
+        this.selectedSquare = selectedSquare;
+    }
+
+    public Piece getPieceAt(String position) {
+        for (Piece piece : pieces) {
+            if (piece.getPosition().equals(position)) {
+                return piece;
+            }
+        }
+        return null;
     }
 
     public BoardState getBoardState() {

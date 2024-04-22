@@ -21,8 +21,15 @@ public class Controller {
     @GetMapping("/play")
     public ResponseEntity<String> makeMove(@RequestParam String move) throws ControllerServiceException {
         controllerService.makeMove(move);
+        controllerService.board.setSelectedSquare(null);
 
         return ResponseEntity.ok(controllerService.boardPrinter.printMarkdown());
     }
 
+    @GetMapping("/select")
+    public ResponseEntity<String> selectSquare(@RequestParam String square) {
+        controllerService.board.selectSquare(square);
+
+        return ResponseEntity.ok(controllerService.boardPrinter.printMarkdown());
+    }
 }
