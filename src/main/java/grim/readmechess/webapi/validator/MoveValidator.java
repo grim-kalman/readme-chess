@@ -15,7 +15,6 @@ public class MoveValidator {
     }
 
     public boolean isValid(String move) {
-        Optional<List<String>> validMoves = this.engineService.getValidMoves();
-        return validMoves.isPresent() && validMoves.get().contains(move);
+        return this.engineService.getValidMoves().contains(move);
     }
 }

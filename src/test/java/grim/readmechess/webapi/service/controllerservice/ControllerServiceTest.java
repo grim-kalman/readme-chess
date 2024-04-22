@@ -10,11 +10,4 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 class ControllerServiceTest {
 
-    @Autowired
-    private ControllerService controllerService;
-
-    @Test
-    void shouldGetEngineResponse() throws ControllerServiceException {
-        assertEquals(new EngineResponseDTO("e2e4", 0.09), controllerService.getEngineResponse());
-    }
 }

@@ -1,7 +1,6 @@
 package grim.readmechess.webapi.controller;
 
 import grim.readmechess.webapi.service.controllerservice.ControllerService;
-import grim.readmechess.webapi.service.controllerservice.ControllerServiceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,17 +18,14 @@ public class Controller {
     }
 
     @GetMapping("/play")
-    public ResponseEntity<String> makeMove(@RequestParam String move) throws ControllerServiceException {
-        controllerService.makeMove(move);
-        controllerService.board.setSelectedSquare(null);
-
-        return ResponseEntity.ok(controllerService.boardPrinter.printMarkdown());
+    public ResponseEntity<String> play(@RequestParam String move) {
+        controllerService.play(move);
+        return ResponseEntity.ok(controllerService.printBoard());
     }
 
     @GetMapping("/select")
-    public ResponseEntity<String> selectSquare(@RequestParam String square) {
-        controllerService.board.selectSquare(square);
-
-        return ResponseEntity.ok(controllerService.boardPrinter.printMarkdown());
+    public ResponseEntity<String> select(@RequestParam String square) {
+        controllerService.select(square);
+        return ResponseEntity.ok(controllerService.printBoard());
     }
 }

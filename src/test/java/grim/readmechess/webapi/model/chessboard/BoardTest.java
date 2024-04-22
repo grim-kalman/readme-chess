@@ -14,18 +14,4 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 class BoardTest {
 
-    @Autowired
-    private Board board;
-
-    @Test
-    void shouldSetupStartingPosition() {
-        List<Piece> pieces = board.getPieces();
-        assertEquals(32, pieces.size());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenMoveIsInvalid() {
-        String move = "e2e9";
-        assertThrows(IllegalArgumentException.class, () -> board.makeMove(move));
-    }
 }

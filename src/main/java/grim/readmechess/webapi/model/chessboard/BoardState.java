@@ -61,16 +61,9 @@ public class BoardState {
     }
 
     public void updateCastlingRights(String fromSquare) {
-        switch (fromSquare) {
-            case "e1" -> castlingAvailability = castlingAvailability.replace("K", "").replace("Q", "");
-            case "e8" -> castlingAvailability = castlingAvailability.replace("k", "").replace("q", "");
-            case "a1" -> castlingAvailability = castlingAvailability.replace("Q", "");
-            case "h1" -> castlingAvailability = castlingAvailability.replace("K", "");
-            case "a8" -> castlingAvailability = castlingAvailability.replace("q", "");
-            case "h8" -> castlingAvailability = castlingAvailability.replace("k", "");
-            default -> {
-                // No action
-            }
+        if (fromSquare.matches("[eah][18]")) {
+            castlingAvailability = castlingAvailability.replace(fromSquare.charAt(0) == 'a' ? "Q" : "K", "");
+            castlingAvailability = castlingAvailability.replace(fromSquare.charAt(1) == '1' ? "Q" : "q", "");
         }
     }
 
@@ -79,18 +72,20 @@ public class BoardState {
     }
 
     public void updateHalfMoveClock(String toSquare, List<Piece> pieces) {
-        boolean pieceFound = false;
-        for (Piece piece : pieces) {
-            if (piece.getPosition().equals(toSquare)) {
-                pieces.remove(piece);
-                halfMoveClock = 0;
-                pieceFound = true;
-                break;
-            }
-        }
-        if (!pieceFound) {
+        Piece piece = findPiece(toSquare, pieces);
+        if (piece != null) {
+            pieces.remove(piece);
+            halfMoveClock = 0;
+        } else {
             halfMoveClock += 1;
         }
+    }
+
+    private Piece findPiece(String position, List<Piece> pieces) {
+        return pieces.stream()
+                .filter(piece -> piece.getPosition().equals(position))
+                .findFirst()
+                .orElse(null);
     }
 
     public void handleEnPassantTarget(String fromSquare, String toSquare) {
