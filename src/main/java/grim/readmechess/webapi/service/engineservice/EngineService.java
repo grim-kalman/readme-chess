@@ -12,7 +12,6 @@ import java.util.Optional;
 
 @Service
 public class EngineService {
-    private Process engineProcess;
     private BufferedReader output;
     private PrintWriter input;
 
@@ -20,7 +19,7 @@ public class EngineService {
 
     public void startEngine(String pathToEngine) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder(pathToEngine);
-        engineProcess = processBuilder.start();
+        Process engineProcess = processBuilder.start();
         output = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
         input = new PrintWriter(engineProcess.getOutputStream(), true);
         lastEvaluation = getEvaluation();
@@ -28,12 +27,6 @@ public class EngineService {
 
     public void sendCommand(String command) {
         input.println(command);
-    }
-
-    public void stopEngine() throws IOException {
-        output.close();
-        input.close();
-        engineProcess.destroy();
     }
 
     public void updateEngineState(String fen) {
