@@ -25,28 +25,11 @@ public class Board {
     }
 
     public void selectSquare(String square) {
-        if (square.equals(this.selectedSquare)) {
-            this.selectedSquare = null;
-        } else {
-            this.selectedSquare = square;
-        }
+        this.selectedSquare = square.equals(this.selectedSquare) ? null : square;
     }
 
     public String getSelectedSquare() {
         return selectedSquare;
-    }
-
-    public void setSelectedSquare(String selectedSquare) {
-        this.selectedSquare = selectedSquare;
-    }
-
-    public Piece getPieceAt(String position) {
-        for (Piece piece : pieces) {
-            if (piece.getPosition().equals(position)) {
-                return piece;
-            }
-        }
-        return null;
     }
 
     public BoardState getBoardState() {

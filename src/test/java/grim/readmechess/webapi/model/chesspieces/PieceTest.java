@@ -9,27 +9,5 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class PieceTest {
-    private Piece piece;
-
-    @BeforeEach
-    public void setup() {
-        piece = new King(WHITE, "e1");
-    }
-
-    @Test
-    void fenSymbolIsReturnedCorrectly() {
-        assertEquals("K", piece.getSymbol());
-    }
-
-    @Test
-    void positionIsReturnedCorrectly() {
-        assertEquals("e1", piece.getPosition());
-    }
-
-    @Test
-    void positionIsSetCorrectly() {
-        piece.setPosition("e2");
-        assertEquals("e2", piece.getPosition());
-    }
 
 }

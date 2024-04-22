@@ -5,7 +5,6 @@ import grim.readmechess.webapi.service.engineservice.EngineService;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -25,13 +24,11 @@ public class BoardPrinter {
     }
 
     public String printMarkdown() {
-        String[][] boardRepresentation = createBoardRepresentation();
-        return convertToMarkdown(boardRepresentation);
+        return convertToMarkdown(createBoardRepresentation());
     }
 
     public String printFEN() {
-        String[][] boardRepresentation = createBoardRepresentation();
-        return convertToFEN(boardRepresentation);
+        return convertToFEN(createBoardRepresentation());
     }
 
     private String[][] createBoardRepresentation() {
@@ -43,15 +40,14 @@ public class BoardPrinter {
     }
 
     private void updateBoardRepresentation(String[][] boardRepresentation, Piece piece) {
-        String position = piece.getPosition();
-        int col = columnToIndex(position.charAt(0));
-        int row = rowToIndex(position.charAt(1));
+        int col = columnToIndex(piece.getPosition().charAt(0));
+        int row = rowToIndex(piece.getPosition().charAt(1));
         boardRepresentation[row][col] = piece.getSymbol();
     }
 
     private String convertToMarkdown(String[][] boardRepresentation) {
-        String header =    "|       |  _a_  |  _b_  |  _c_  |  _d_  |  _e_  |  _f_  |  _g_  |  _h_  |";
-        String separator = "| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |";
+        String header =    "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |";
+        String separator = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
         String table = IntStream.range(0, boardRepresentation.length)
                 .mapToObj(i -> rowToMarkdown(boardRepresentation[i], boardRepresentation.length - i))
                 .collect(Collectors.joining("\n"));
@@ -60,31 +56,22 @@ public class BoardPrinter {
     }
 
     private String rowToMarkdown(String[] row, int rowNumber) {
-        List<String> validMoves = engineService.getValidMoves().orElse(Collections.emptyList());
+        List<String> validMoves = engineService.getValidMoves();
         String rowContent = IntStream.range(0, row.length)
                 .mapToObj(i -> squareToMarkdown(row[i], (char) ('a' + i) + Integer.toString(rowNumber), validMoves))
-                .collect(Collectors.joining("   |   "));
-
-        return String.format("|  _%d_  |   %s   |", rowNumber, rowContent);
+                .collect(Collectors.joining("  |  "));
+        return String.format("|  %d  |  %s  |", rowNumber, rowContent);
     }
 
     private String squareToMarkdown(String square, String position, List<String> validMoves) {
         String selectedSquare = board.getSelectedSquare();
-        if (selectedSquare != null) {
-            String selectedPieceSymbol = board.getPieceAt(selectedSquare).getSymbol();
-            List<String> validMovesFromSelectedSquare = validMoves.stream()
-                    .filter(move -> move.startsWith(selectedSquare))
-                    .toList();
-
-            if (validMovesFromSelectedSquare.stream().anyMatch(move -> move.endsWith(position))) {
-                return String.format("[_%s_](http://localhost:8080/api/chess/play?move=%s%s)", selectedPieceSymbol, selectedSquare, position);
-            }
+        if (selectedSquare != null && validMoves.stream().anyMatch(move -> move.startsWith(selectedSquare) && move.endsWith(position))) {
+            String squareSymbol = square != null ? square : "_";
+            return String.format("[%s](http://localhost:8080/api/chess/play?move=%s%s)", squareSymbol, selectedSquare, position);
         }
-
         if (validMoves.stream().anyMatch(move -> move.startsWith(position))) {
             return String.format("[%s](http://localhost:8080/api/chess/select?square=%s)", square, position);
         }
-
         return square == null ? " " : square;
     }
 
@@ -92,7 +79,6 @@ public class BoardPrinter {
         String boardFen = Arrays.stream(boardRepresentation)
                 .map(this::convertRowToFen)
                 .collect(Collectors.joining("/"));
-
         return String.format("%s %s %s %s %d %d",
                 boardFen,
                 board.getBoardState().getActiveColor(),
