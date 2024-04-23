@@ -7,13 +7,14 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static grim.readmechess.utils.Utils.columnToIndex;
 import static grim.readmechess.utils.Utils.rowToIndex;
 
 @Component
 public class BoardPrinter {
+
+    private static final int BOARD_SIZE = 8;
 
     private final Board board;
     private final EngineService engineService;
@@ -32,7 +33,7 @@ public class BoardPrinter {
     }
 
     private String[][] createBoardRepresentation() {
-        String[][] boardRepresentation = new String[8][8];
+        String[][] boardRepresentation = new String[BOARD_SIZE][BOARD_SIZE];
         for (Piece piece : board.getPieces()) {
             updateBoardRepresentation(boardRepresentation, piece);
         }
@@ -46,31 +47,50 @@ public class BoardPrinter {
     }
 
     private String convertToMarkdown(String[][] boardRepresentation) {
-        String header =    "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |";
+        String header = "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |";
         String separator = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
-        String table = IntStream.range(0, boardRepresentation.length)
-                .mapToObj(i -> rowToMarkdown(boardRepresentation[i], boardRepresentation.length - i))
-                .collect(Collectors.joining("\n"));
-
+        String table = buildMarkdownTable(boardRepresentation);
         return String.format("%s%n%s%n%s", header, separator, table);
+    }
+
+    private String buildMarkdownTable(String[][] boardRepresentation) {
+        StringBuilder tableBuilder = new StringBuilder();
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            String rowMarkdown = rowToMarkdown(boardRepresentation[i], BOARD_SIZE - i);
+            tableBuilder.append(rowMarkdown);
+            if (i < BOARD_SIZE - 1) {
+                tableBuilder.append("\n");
+            }
+        }
+        return tableBuilder.toString();
     }
 
     private String rowToMarkdown(String[] row, int rowNumber) {
         List<String> validMoves = engineService.getValidMoves();
-        String rowContent = IntStream.range(0, row.length)
-                .mapToObj(i -> squareToMarkdown(row[i], (char) ('a' + i) + Integer.toString(rowNumber), validMoves))
-                .collect(Collectors.joining("  |  "));
+        String rowContent = buildRowContent(row, rowNumber, validMoves);
         return String.format("|  %d  |  %s  |", rowNumber, rowContent);
+    }
+
+    private String buildRowContent(String[] row, int rowNumber, List<String> validMoves) {
+        StringBuilder rowContentBuilder = new StringBuilder();
+        for (int i = 0; i < row.length; i++) {
+            String squareMarkdown = squareToMarkdown(row[i], (char) ('a' + i) + Integer.toString(rowNumber), validMoves);
+            rowContentBuilder.append(squareMarkdown);
+            if (i < row.length - 1) {
+                rowContentBuilder.append("  |  ");
+            }
+        }
+        return rowContentBuilder.toString();
     }
 
     private String squareToMarkdown(String square, String position, List<String> validMoves) {
         String selectedSquare = board.getSelectedSquare();
+        String squareSymbol = square != null ? square : "_";
         if (selectedSquare != null && validMoves.stream().anyMatch(move -> move.startsWith(selectedSquare) && move.endsWith(position))) {
-            String squareSymbol = square != null ? square : "_";
             return String.format("[%s](http://localhost:8080/api/chess/play?move=%s%s)", squareSymbol, selectedSquare, position);
         }
         if (validMoves.stream().anyMatch(move -> move.startsWith(position))) {
-            return String.format("[%s](http://localhost:8080/api/chess/select?square=%s)", square, position);
+            return String.format("[%s](http://localhost:8080/api/chess/select?square=%s)", squareSymbol, position);
         }
         return square == null ? " " : square;
     }
