@@ -86,10 +86,15 @@ public class BoardPrinter {
     private String squareToMarkdown(String square, String position, List<String> validMoves) {
         String selectedSquare = board.getSelectedSquare();
         String squareSymbol = square != null ? square : "_";
-        if (selectedSquare != null && validMoves.stream().anyMatch(move -> move.startsWith(selectedSquare) && move.endsWith(position))) {
+
+        boolean isPartOfValidMove = validMoves.stream().anyMatch(move -> move.startsWith(selectedSquare) && move.endsWith(position));
+        boolean isStartOfValidMove = validMoves.stream().anyMatch(move -> move.startsWith(position));
+
+        if (selectedSquare != null && isPartOfValidMove) {
             return String.format("[%s](http://localhost:8080/api/chess/play?move=%s%s)", squareSymbol, selectedSquare, position);
         }
-        if (validMoves.stream().anyMatch(move -> move.startsWith(position))) {
+
+        if (isStartOfValidMove) {
             return String.format("[%s](http://localhost:8080/api/chess/select?square=%s)", squareSymbol, position);
         }
         return square == null ? " " : square;
