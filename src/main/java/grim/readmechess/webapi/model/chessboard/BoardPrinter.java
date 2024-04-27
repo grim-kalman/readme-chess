@@ -15,6 +15,8 @@ import static grim.readmechess.utils.Utils.rowToIndex;
 public class BoardPrinter {
 
     private static final int BOARD_SIZE = 8;
+    private static final String MARKDOWN_HEADER = "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |";
+    private static final String MARKDOWN_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
 
     private final Board board;
     private final EngineService engineService;
@@ -35,29 +37,27 @@ public class BoardPrinter {
     private String[][] createBoardRepresentation() {
         String[][] boardRepresentation = new String[BOARD_SIZE][BOARD_SIZE];
         for (Piece piece : board.getPieces()) {
-            updateBoardRepresentation(boardRepresentation, piece);
+            placePieceOnBoard(boardRepresentation, piece);
         }
         return boardRepresentation;
     }
 
-    private void updateBoardRepresentation(String[][] boardRepresentation, Piece piece) {
+    private void placePieceOnBoard(String[][] boardRepresentation, Piece piece) {
         int col = columnToIndex(piece.getPosition().charAt(0));
         int row = rowToIndex(piece.getPosition().charAt(1));
         boardRepresentation[row][col] = piece.getSymbol();
     }
 
     private String convertToMarkdown(String[][] boardRepresentation) {
-        String header = "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |";
-        String separator = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
         String table = buildMarkdownTable(boardRepresentation);
-        return String.format("%s%n%s%n%s", header, separator, table);
+        return String.format("%s%n%s%n%s", MARKDOWN_HEADER, MARKDOWN_SEPARATOR, table);
     }
 
     private String buildMarkdownTable(String[][] boardRepresentation) {
         StringBuilder tableBuilder = new StringBuilder();
+        List<String> validMoves = engineService.getValidMoves();
         for (int i = 0; i < BOARD_SIZE; i++) {
-            String rowMarkdown = rowToMarkdown(boardRepresentation[i], BOARD_SIZE - i);
-            tableBuilder.append(rowMarkdown);
+            tableBuilder.append(formatMarkdownRow(boardRepresentation[i], BOARD_SIZE - i, validMoves));
             if (i < BOARD_SIZE - 1) {
                 tableBuilder.append("\n");
             }
@@ -65,13 +65,12 @@ public class BoardPrinter {
         return tableBuilder.toString();
     }
 
-    private String rowToMarkdown(String[] row, int rowNumber) {
-        List<String> validMoves = engineService.getValidMoves();
-        String rowContent = buildRowContent(row, rowNumber, validMoves);
+    private String formatMarkdownRow(String[] row, int rowNumber, List<String> validMoves) {
+        String rowContent = rowToMarkdown(row, rowNumber, validMoves);
         return String.format("|  %d  |  %s  |", rowNumber, rowContent);
     }
 
-    private String buildRowContent(String[] row, int rowNumber, List<String> validMoves) {
+    private String rowToMarkdown(String[] row, int rowNumber, List<String> validMoves) {
         StringBuilder rowContentBuilder = new StringBuilder();
         for (int i = 0; i < row.length; i++) {
             String squareMarkdown = squareToMarkdown(row[i], (char) ('a' + i) + Integer.toString(rowNumber), validMoves);
@@ -87,17 +86,33 @@ public class BoardPrinter {
         String selectedSquare = board.getSelectedSquare();
         String squareSymbol = square != null ? square : "_";
 
-        boolean isPartOfValidMove = validMoves.stream().anyMatch(move -> move.startsWith(selectedSquare) && move.endsWith(position));
-        boolean isStartOfValidMove = validMoves.stream().anyMatch(move -> move.startsWith(position));
-
-        if (selectedSquare != null && isPartOfValidMove) {
-            return String.format("[%s](http://localhost:8080/api/chess/play?move=%s%s)", squareSymbol, selectedSquare, position);
+        if (square != null) {
+            if (Character.isLowerCase(square.charAt(0))) {
+                squareSymbol = "_" + square + "_";
+            } else {
+                squareSymbol = "**" + square + "**";
+            }
         }
 
-        if (isStartOfValidMove) {
-            return String.format("[%s](http://localhost:8080/api/chess/select?square=%s)", squareSymbol, position);
+        if (selectedSquare != null && isValidMove(selectedSquare + position, validMoves)) {
+            return formatMarkdownLink(squareSymbol, "play", selectedSquare + position, "move");
+        } else if (isStartOfValidMove(position, validMoves)) {
+            return formatMarkdownLink(squareSymbol, "select", position, "square");
+        } else {
+            return square == null ? " " : squareSymbol;
         }
-        return square == null ? " " : square;
+    }
+
+    private boolean isValidMove(String move, List<String> validMoves) {
+        return validMoves.stream().anyMatch(validMove -> validMove.equals(move));
+    }
+
+    private boolean isStartOfValidMove(String position, List<String> validMoves) {
+        return validMoves.stream().anyMatch(validMove -> validMove.startsWith(position));
+    }
+
+    private String formatMarkdownLink(String squareSymbol, String action, String parameter, String queryParamName) {
+        return String.format("[%s](http://localhost:8080/api/chess/%s?%s=%s)", squareSymbol, action, queryParamName, parameter);
     }
 
     private String convertToFEN(String[][] boardRepresentation) {
