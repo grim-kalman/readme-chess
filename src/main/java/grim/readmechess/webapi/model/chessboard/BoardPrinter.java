@@ -5,8 +5,10 @@ import grim.readmechess.webapi.service.engineservice.EngineService;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static grim.readmechess.utils.Utils.columnToIndex;
 import static grim.readmechess.utils.Utils.rowToIndex;
@@ -14,6 +16,9 @@ import static grim.readmechess.utils.Utils.rowToIndex;
 @Component
 public class BoardPrinter {
 
+    private static final int MAX_SCORE = 5;
+    private static final int MIN_SCORE = -5;
+    private static final int TOTAL_BARS = 30;
     private static final int BOARD_SIZE = 8;
     private static final String MARKDOWN_HEADER = "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |";
     private static final String MARKDOWN_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
@@ -27,7 +32,11 @@ public class BoardPrinter {
     }
 
     public String printMarkdown() {
-        return convertToMarkdown(createBoardRepresentation());
+        return String.format("Evaluation:%n%n%s%n%n%s%n%s%n%s",
+                createProgressBar(),
+                MARKDOWN_HEADER,
+                MARKDOWN_SEPARATOR,
+                buildMarkdownTable(createBoardRepresentation()));
     }
 
     public String printFEN() {
@@ -37,74 +46,65 @@ public class BoardPrinter {
     private String[][] createBoardRepresentation() {
         String[][] boardRepresentation = new String[BOARD_SIZE][BOARD_SIZE];
         for (Piece piece : board.getPieces()) {
-            placePieceOnBoard(boardRepresentation, piece);
+            int col = columnToIndex(piece.getPosition().charAt(0));
+            int row = rowToIndex(piece.getPosition().charAt(1));
+            boardRepresentation[row][col] = piece.getSymbol();
         }
         return boardRepresentation;
     }
 
-    private void placePieceOnBoard(String[][] boardRepresentation, Piece piece) {
-        int col = columnToIndex(piece.getPosition().charAt(0));
-        int row = rowToIndex(piece.getPosition().charAt(1));
-        boardRepresentation[row][col] = piece.getSymbol();
-    }
-
-    private String convertToMarkdown(String[][] boardRepresentation) {
-        String table = buildMarkdownTable(boardRepresentation);
-        return String.format("%s%n%s%n%s", MARKDOWN_HEADER, MARKDOWN_SEPARATOR, table);
+    public String createProgressBar() {
+        double evaluation = engineService.getEngineResponse().evaluation();
+        int filledBars = (int) Math.round((evaluation - MIN_SCORE) * TOTAL_BARS / (MAX_SCORE - MIN_SCORE));
+        return String.join("", Collections.nCopies(filledBars, "█")) + " " + evaluation;
     }
 
     private String buildMarkdownTable(String[][] boardRepresentation) {
-        StringBuilder tableBuilder = new StringBuilder();
         List<String> validMoves = engineService.getValidMoves();
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            tableBuilder.append(formatMarkdownRow(boardRepresentation[i], BOARD_SIZE - i, validMoves));
-            if (i < BOARD_SIZE - 1) {
-                tableBuilder.append("\n");
-            }
-        }
-        return tableBuilder.toString();
+        return IntStream.range(0, 8)
+                .mapToObj(i -> formatMarkdownRow(boardRepresentation[i], 8 - i, validMoves))
+                .collect(Collectors.joining("\n"));
     }
 
     private String formatMarkdownRow(String[] row, int rowNumber, List<String> validMoves) {
-        String rowContent = rowToMarkdown(row, rowNumber, validMoves);
-        return String.format("|  %d  |  %s  |", rowNumber, rowContent);
+        return String.format("|  %d  |  %s  |", rowNumber, rowToMarkdown(row, rowNumber, validMoves));
     }
 
     private String rowToMarkdown(String[] row, int rowNumber, List<String> validMoves) {
-        StringBuilder rowContentBuilder = new StringBuilder();
-        for (int i = 0; i < row.length; i++) {
-            String squareMarkdown = squareToMarkdown(row[i], (char) ('a' + i) + Integer.toString(rowNumber), validMoves);
-            rowContentBuilder.append(squareMarkdown);
-            if (i < row.length - 1) {
-                rowContentBuilder.append("  |  ");
-            }
-        }
-        return rowContentBuilder.toString();
+        return IntStream.range(0, row.length)
+                .mapToObj(i -> squareToMarkdown(row[i], (char) ('a' + i) + Integer.toString(rowNumber), validMoves))
+                .collect(Collectors.joining("  |  "));
     }
 
     private String squareToMarkdown(String square, String position, List<String> validMoves) {
         String selectedSquare = board.getSelectedSquare();
-        String squareSymbol = square != null ? square : "_";
-
-        if (square != null) {
-            if (Character.isLowerCase(square.charAt(0))) {
-                squareSymbol = "_" + square + "_";
-            } else {
-                squareSymbol = "**" + square + "**";
-            }
-        }
+        String squareSymbol = formatSquareSymbol(square);
 
         if (selectedSquare != null && isValidMove(selectedSquare + position, validMoves)) {
             return formatMarkdownLink(squareSymbol, "play", selectedSquare + position, "move");
         } else if (isStartOfValidMove(position, validMoves)) {
             return formatMarkdownLink(squareSymbol, "select", position, "square");
+        } else if (square == null) {
+            return " ";
         } else {
-            return square == null ? " " : squareSymbol;
+            return squareSymbol;
+        }
+    }
+
+    private String formatSquareSymbol(String square) {
+        if (square == null) {
+            return "_";
+        }
+
+        if (Character.isLowerCase(square.charAt(0))) {
+            return "_" + square + "_";
+        } else {
+            return "**" + square + "**";
         }
     }
 
     private boolean isValidMove(String move, List<String> validMoves) {
-        return validMoves.stream().anyMatch(validMove -> validMove.equals(move));
+        return validMoves.contains(move);
     }
 
     private boolean isStartOfValidMove(String position, List<String> validMoves) {
