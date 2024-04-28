@@ -3,7 +3,7 @@ package grim.readmechess.webapi.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import grim.readmechess.webapi.service.controllerservice.ControllerService;
 import grim.readmechess.webapi.service.githubservice.GithubService;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,14 +23,14 @@ public class Controller {
     }
 
     @GetMapping("/play")
-    public RedirectView play(@RequestParam String move) throws JsonProcessingException {
+    public RedirectView play(@RequestParam String move) throws Exception {
         controllerService.play(move);
         githubService.updateReadme();
         return new RedirectView("https://github.com/grim-kalman");
     }
 
     @GetMapping("/select")
-    public RedirectView select(@RequestParam String square) throws JsonProcessingException {
+    public RedirectView select(@RequestParam String square) throws Exception {
         controllerService.select(square);
         githubService.updateReadme();
         return new RedirectView("https://github.com/grim-kalman");
