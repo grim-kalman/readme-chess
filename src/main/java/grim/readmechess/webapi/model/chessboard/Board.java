@@ -69,6 +69,7 @@ public class Board {
         }
     }
 
+    // TODO: make sure that castling is handled correctly in the makeMove method
     public void makeMove(String move) {
         if (moveValidator.isValid(move)) {
             String fromSquare = move.substring(0, 2);
