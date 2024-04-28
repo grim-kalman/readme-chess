@@ -5,7 +5,6 @@ import grim.readmechess.webapi.service.engineservice.EngineService;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -16,9 +15,6 @@ import static grim.readmechess.utils.Utils.rowToIndex;
 @Component
 public class BoardPrinter {
 
-    private static final int MAX_SCORE = 5;
-    private static final int MIN_SCORE = -5;
-    private static final int TOTAL_BARS = 30;
     private static final int BOARD_SIZE = 8;
     private static final String MARKDOWN_HEADER = "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |";
     private static final String MARKDOWN_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
@@ -32,8 +28,11 @@ public class BoardPrinter {
     }
 
     public String printMarkdown() {
-        return String.format("Evaluation:%n%n%s%n%n%s%n%s%n%s",
-                createProgressBar(),
+        double evaluation = engineService.getEngineResponse().evaluation();
+        String formattedEvaluation = evaluation > 0 ? "+" + evaluation : String.valueOf(evaluation);
+
+        return String.format("Evaluation: %s%n%n%n%n%s%n%s%n%s",
+                formattedEvaluation,
                 MARKDOWN_HEADER,
                 MARKDOWN_SEPARATOR,
                 buildMarkdownTable(createBoardRepresentation()));
@@ -51,12 +50,6 @@ public class BoardPrinter {
             boardRepresentation[row][col] = piece.getSymbol();
         }
         return boardRepresentation;
-    }
-
-    public String createProgressBar() {
-        double evaluation = engineService.getEngineResponse().evaluation();
-        int filledBars = (int) Math.round((evaluation - MIN_SCORE) * TOTAL_BARS / (MAX_SCORE - MIN_SCORE));
-        return String.join("", Collections.nCopies(filledBars, "█")) + " " + evaluation;
     }
 
     private String buildMarkdownTable(String[][] boardRepresentation) {
