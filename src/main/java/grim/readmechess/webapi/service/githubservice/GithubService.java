@@ -1,6 +1,5 @@
 package grim.readmechess.webapi.service.githubservice;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grim.readmechess.webapi.service.controllerservice.ControllerService;
@@ -12,18 +11,20 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class GithubService {
-    private static final String GITHUB_API_URL = "https://api.github.com";
-    private static final String REPOS = "/repos/";
-    private static final String OWNER = "grim-kalman";
-    private static final String REPO = "grim-kalman";
+    private static final String GITHUB_API_URL = "https://api.github.com/repos/%s/%s";
     private static final String README_PATH = "README.md";
     private static final String BRANCH = "main";
+
+    @Value("${github.owner}")
+    private String owner;
+
+    @Value("${github.repo}")
+    private String repo;
 
     @Value("${github.token}")
     private String token;
@@ -37,39 +38,54 @@ public class GithubService {
         this.restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
-    public void updateReadme() throws JsonProcessingException {
+    public void updateReadme() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);
         HttpEntity<String> headersEntity = new HttpEntity<>(headers);
         ObjectMapper mapper = new ObjectMapper();
 
-        JsonNode latestCommitResponse = get(GITHUB_API_URL + REPOS + OWNER + "/" + REPO + "/git/refs/heads/main", HttpMethod.GET, headersEntity);
-        String latestCommitSha = latestCommitResponse.get("object").get("sha").asText();
-
+        String latestCommitSha = getLatestCommitSha(headersEntity);
         String newBoardState = controllerService.printBoard();
-        Map<String, Object> newTreeMap = new HashMap<>();
-        newTreeMap.put("base_tree", latestCommitSha);
-        newTreeMap.put("tree", List.of(Map.of("path", README_PATH, "mode", "100644", "type", "blob", "content", newBoardState)));
-        String newTreeJson = mapper.writeValueAsString(newTreeMap);
 
-        JsonNode newTreeResponse = post(GITHUB_API_URL + REPOS + OWNER + "/" + REPO + "/git/trees", newTreeJson, headersEntity);
-        String newTreeSha = newTreeResponse.get("sha").asText();
+        String newTreeSha = createNewTree(headersEntity, latestCommitSha, newBoardState, mapper);
+        String newCommitSha = createNewCommit(headersEntity, latestCommitSha, newTreeSha);
 
-        String newCommitJson = "{ \"message\": \"Update README\", \"parents\": [\"" + latestCommitSha + "\"], \"tree\": \"" + newTreeSha + "\" }";
-        JsonNode newCommitResponse = post(GITHUB_API_URL + REPOS + OWNER + "/" + REPO + "/git/commits", newCommitJson, headersEntity);
-        String newCommitSha = newCommitResponse.get("sha").asText();
-
-        String updateRefJson = "{ \"sha\": \"" + newCommitSha + "\" }";
-        restTemplate.exchange(GITHUB_API_URL + REPOS + OWNER + "/" + REPO + "/git/refs/heads/" + BRANCH, HttpMethod.PATCH, new HttpEntity<>(updateRefJson, headers), String.class);
+        updateRef(headers, newCommitSha);
     }
 
-    private JsonNode get(String url, HttpMethod method, HttpEntity<String> entity) throws JsonProcessingException {
-        String response = restTemplate.exchange(url, method, entity, String.class).getBody();
+    private String getLatestCommitSha(HttpEntity<String> headersEntity) throws Exception {
+        JsonNode latestCommitResponse = get(headersEntity);
+        return latestCommitResponse.get("object").get("sha").asText();
+    }
+
+    private String createNewTree(HttpEntity<String> headersEntity, String latestCommitSha, String newBoardState, ObjectMapper mapper) throws Exception {
+        Map<String, Object> newTreeMap = Map.of(
+                "base_tree", latestCommitSha,
+                "tree", List.of(Map.of("path", README_PATH, "mode", "100644", "type", "blob", "content", newBoardState))
+        );
+        String newTreeJson = mapper.writeValueAsString(newTreeMap);
+        JsonNode newTreeResponse = post("/git/trees", newTreeJson, headersEntity);
+        return newTreeResponse.get("sha").asText();
+    }
+
+    private String createNewCommit(HttpEntity<String> headersEntity, String latestCommitSha, String newTreeSha) throws Exception {
+        String newCommitJson = "{ \"message\": \"Update README\", \"parents\": [\"" + latestCommitSha + "\"], \"tree\": \"" + newTreeSha + "\" }";
+        JsonNode newCommitResponse = post("/git/commits", newCommitJson, headersEntity);
+        return newCommitResponse.get("sha").asText();
+    }
+
+    private void updateRef(HttpHeaders headers, String newCommitSha) {
+        String updateRefJson = "{ \"sha\": \"" + newCommitSha + "\" }";
+        restTemplate.exchange(String.format(GITHUB_API_URL, owner, repo) + "/git/refs/heads/" + BRANCH, HttpMethod.PATCH, new HttpEntity<>(updateRefJson, headers), String.class);
+    }
+
+    private JsonNode get(HttpEntity<String> entity) throws Exception {
+        String response = restTemplate.exchange(String.format(GITHUB_API_URL, owner, repo) + "/git/refs/heads/main", HttpMethod.GET, entity, String.class).getBody();
         return new ObjectMapper().readTree(response);
     }
 
-    private JsonNode post(String url, String body, HttpEntity<String> headersEntity) throws JsonProcessingException {
-        String response = restTemplate.postForEntity(url, new HttpEntity<>(body, headersEntity.getHeaders()), String.class).getBody();
+    private JsonNode post(String endpoint, String body, HttpEntity<String> headersEntity) throws Exception {
+        String response = restTemplate.postForEntity(String.format(GITHUB_API_URL, owner, repo) + endpoint, new HttpEntity<>(body, headersEntity.getHeaders()), String.class).getBody();
         return new ObjectMapper().readTree(response);
     }
 }
