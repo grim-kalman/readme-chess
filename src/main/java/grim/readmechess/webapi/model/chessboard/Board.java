@@ -69,7 +69,6 @@ public class Board {
         }
     }
 
-    // TODO: make sure that castling is handled correctly in the makeMove method
     public void makeMove(String move) {
         if (moveValidator.isValid(move)) {
             String fromSquare = move.substring(0, 2);
@@ -95,9 +94,21 @@ public class Board {
                 if (piece instanceof Pawn) {
                     boardState.setHalfMoveClock(0);
                     boardState.handleEnPassantTarget(fromSquare, toSquare);
+                } else if (isCastlingMove(piece, fromSquare, toSquare)) {
+                    handleCastling(toSquare);
                 }
                 break;
             }
         }
+    }
+
+    private boolean isCastlingMove(Piece piece, String fromSquare, String toSquare) {
+        return piece instanceof King && Math.abs(fromSquare.charAt(0) - toSquare.charAt(0)) == 2;
+    }
+
+    private void handleCastling(String toSquare) {
+        String rookFromSquare = (toSquare.charAt(0) == 'g' ? "h" : "a") + toSquare.charAt(1);
+        String rookToSquare = (toSquare.charAt(0) == 'g' ? "f" : "d") + toSquare.charAt(1);
+        movePiece(rookFromSquare, rookToSquare);
     }
 }

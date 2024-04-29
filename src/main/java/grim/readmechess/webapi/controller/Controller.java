@@ -1,6 +1,5 @@
 package grim.readmechess.webapi.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import grim.readmechess.webapi.service.controllerservice.ControllerService;
 import grim.readmechess.webapi.service.githubservice.GithubService;
 
