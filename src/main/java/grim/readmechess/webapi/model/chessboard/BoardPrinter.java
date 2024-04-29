@@ -69,6 +69,7 @@ public class BoardPrinter {
                 .collect(Collectors.joining("  |  "));
     }
 
+    // TODO: Make all own pieces clickable, this will make the board more clear. However nothing should happen when clicking a piece with no moves.
     private String squareToMarkdown(String square, String position, List<String> validMoves) {
         String selectedSquare = board.getSelectedSquare();
         String squareSymbol = formatSquareSymbol(square);
