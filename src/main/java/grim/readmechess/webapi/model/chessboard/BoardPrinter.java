@@ -60,7 +60,7 @@ public class BoardPrinter {
     }
 
     private String formatMarkdownRow(String[] row, int rowNumber, List<String> validMoves) {
-        return String.format("|  %d  |  %s  |", rowNumber, rowToMarkdown(row, rowNumber, validMoves));
+        return String.format("|  **%d**  |  %s  |", rowNumber, rowToMarkdown(row, rowNumber, validMoves));
     }
 
     private String rowToMarkdown(String[] row, int rowNumber, List<String> validMoves) {
@@ -69,32 +69,27 @@ public class BoardPrinter {
                 .collect(Collectors.joining("  |  "));
     }
 
-    // TODO: Make all own pieces clickable, this will make the board more clear. However nothing should happen when clicking a piece with no moves.
     private String squareToMarkdown(String square, String position, List<String> validMoves) {
         String selectedSquare = board.getSelectedSquare();
         String squareSymbol = formatSquareSymbol(square);
 
         if (selectedSquare != null && isValidMove(selectedSquare + position, validMoves)) {
             return formatMarkdownLink(squareSymbol, "play", selectedSquare + position, "move");
-        } else if (isStartOfValidMove(position, validMoves)) {
-            return formatMarkdownLink(squareSymbol, "select", position, "square");
-        } else if (square == null) {
-            return " ";
-        } else {
-            return squareSymbol;
         }
+        if (isStartOfValidMove(position, validMoves)) {
+            return formatMarkdownLink(squareSymbol, "select", position, "square");
+        }
+        if (square == null) {
+            return " ";
+        }
+        return Character.isUpperCase(square.charAt(0)) ? String.format("[%s](https://github.com/grim-kalman)", squareSymbol) : squareSymbol;
     }
 
     private String formatSquareSymbol(String square) {
         if (square == null) {
             return "_";
         }
-
-        if (Character.isLowerCase(square.charAt(0))) {
-            return "_" + square + "_";
-        } else {
-            return "**" + square + "**";
-        }
+        return Character.isLowerCase(square.charAt(0)) ? "_" + square + "_" : "**" + square + "**";
     }
 
     private boolean isValidMove(String move, List<String> validMoves) {
