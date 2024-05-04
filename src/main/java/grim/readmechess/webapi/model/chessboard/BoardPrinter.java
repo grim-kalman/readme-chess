@@ -31,7 +31,7 @@ public class BoardPrinter {
         double evaluation = engineService.getEngineResponse().evaluation();
         String formattedEvaluation = evaluation > 0 ? "+" + evaluation : String.valueOf(evaluation);
 
-        return String.format("Evaluation: %s%n%n%n%n%s%n%s%n%s",
+        return String.format("Evaluation: %s%n%s%n%s%n%s",
                 formattedEvaluation,
                 MARKDOWN_HEADER,
                 MARKDOWN_SEPARATOR,
