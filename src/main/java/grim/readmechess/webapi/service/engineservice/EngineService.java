@@ -34,7 +34,8 @@ public class EngineService {
     }
 
     public EngineResponseDTO getEngineResponse() {
-        return new EngineResponseDTO(getBestMove(), getEvaluation());
+        String bestMove = getBestMove();
+        return new EngineResponseDTO(bestMove, getEvaluation(), "(none)".equals(bestMove));
     }
 
     String getBestMove() {
