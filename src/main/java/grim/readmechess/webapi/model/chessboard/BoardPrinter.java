@@ -74,10 +74,10 @@ public class BoardPrinter {
         String squareSymbol = formatSquareSymbol(square);
 
         if (selectedSquare != null && isValidMove(selectedSquare + position, validMoves)) {
-            return formatMarkdownLink(squareSymbol, "play", selectedSquare + position, "move");
+            return String.format("[%s](http://localhost:8080/api/chess/play?move=%s)", squareSymbol, selectedSquare + position);
         }
         if (isStartOfValidMove(position, validMoves)) {
-            return formatMarkdownLink(squareSymbol, "select", position, "square");
+            return String.format("[%s](http://localhost:8080/api/chess/select?square=%s)", squareSymbol, position);
         }
         if (square == null) {
             return " ";
@@ -98,10 +98,6 @@ public class BoardPrinter {
 
     private boolean isStartOfValidMove(String position, List<String> validMoves) {
         return validMoves.stream().anyMatch(validMove -> validMove.startsWith(position));
-    }
-
-    private String formatMarkdownLink(String squareSymbol, String action, String parameter, String queryParamName) {
-        return String.format("[%s](http://localhost:8080/api/chess/%s?%s=%s)", squareSymbol, action, queryParamName, parameter);
     }
 
     private String convertToFEN(String[][] boardRepresentation) {
