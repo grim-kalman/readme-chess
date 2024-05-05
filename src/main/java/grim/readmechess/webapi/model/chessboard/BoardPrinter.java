@@ -27,12 +27,14 @@ public class BoardPrinter {
         this.engineService = engineService;
     }
 
+    // TODO: make sure the winning side is displayed in the markdown
     public String printMarkdown() {
         double evaluation = engineService.getEngineResponse().evaluation();
         String formattedEvaluation = evaluation > 0 ? "+" + evaluation : String.valueOf(evaluation);
-
-        return String.format("Evaluation: %s%n%s%n%s%n%s",
+        String formattedGameStatus = engineService.getEngineResponse().isGameOver() ? "Game Over" : "In Progress";
+        return String.format("# Readme Chess%n%n**Evaluation:** %s%n%n**Game Status:** %s%n%s%n%s%n%s",
                 formattedEvaluation,
+                formattedGameStatus,
                 MARKDOWN_HEADER,
                 MARKDOWN_SEPARATOR,
                 buildMarkdownTable(createBoardRepresentation()));
