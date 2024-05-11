@@ -1,6 +1,6 @@
 package grim.readmechess;
 
-import grim.readmechess.webapi.model.chesspieces.Bishop;
+import grim.readmechess.model.chesspieces.Bishop;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
