@@ -106,7 +106,7 @@ public class Board {
         String toSquare = extractToSquare(move);
         Piece piece = pieces.get(fromSquare);
         if (piece instanceof Pawn) {
-            handlePawnMove(fromSquare, toSquare, move);
+            handlePawnMove(fromSquare, toSquare);
         } else if (piece instanceof King && isCastlingMove(fromSquare, toSquare)) {
             handleCastling(fromSquare, toSquare);
         } else {
@@ -123,14 +123,14 @@ public class Board {
         boardState.setHalfMoveClock(0);
     }
 
-    private void handlePawnMove(String fromSquare, String toSquare, String move) {
+    private void handlePawnMove(String fromSquare, String toSquare) {
         resetHalfMoveClock();
         movePiece(fromSquare, toSquare);
         if (isTwoStepVerticalMove(fromSquare, toSquare)) {
             handleEnPassant(toSquare);
         }
         if (isPromotionSquare(toSquare)) {
-            promotePawn(toSquare, extractPromotionPiece(move));
+            promotePawn(toSquare);
         }
     }
 
@@ -147,9 +147,9 @@ public class Board {
         return "1".equals(rank) || "8".equals(rank);
     }
 
-    private void promotePawn(String position, String newPieceType) {
+    private void promotePawn(String position) {
         Piece pawn = pieces.remove(position);
-        Piece newPiece = createPieceByType(pawn.getColor(), newPieceType);
+        Piece newPiece = new Queen(pawn.getColor());
         pieces.put(position, newPiece);
     }
 
@@ -174,16 +174,6 @@ public class Board {
         return Math.abs(fromSquare.charAt(0) - toSquare.charAt(0)) == 2;
     }
 
-    private Piece createPieceByType(String color, String type) {
-        return switch (type) {
-            case "Q" -> new Queen(color);
-            case "R" -> new Rook(color);
-            case "B" -> new Bishop(color);
-            case "N" -> new Knight(color);
-            default -> throw new IllegalArgumentException("Illegal promotion piece: " + type);
-        };
-    }
-
     private void handleCastling(String fromSquare, String toSquare) {
         String rookFromSquare = determineRookOriginalSquare(toSquare);
         String rookToSquare = determineRookDestinationSquare(toSquare);
@@ -197,9 +187,5 @@ public class Board {
 
     private String determineRookDestinationSquare(String toSquare) {
         return (toSquare.charAt(0) == 'g' ? "f" : "d") + toSquare.charAt(1);
-    }
-
-    private String extractPromotionPiece(String move) {
-        return String.valueOf(move.charAt(4)).toUpperCase();
     }
 }
