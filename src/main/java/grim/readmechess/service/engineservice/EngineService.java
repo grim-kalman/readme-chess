@@ -18,8 +18,7 @@ public class EngineService {
     private Double lastEvaluation;
 
     public void startEngine(String pathToEngine) throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder(pathToEngine);
-        Process engineProcess = processBuilder.start();
+        Process engineProcess = new ProcessBuilder(pathToEngine).start();
         output = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
         input = new PrintWriter(engineProcess.getOutputStream(), true);
         lastEvaluation = getEvaluation();
