@@ -15,13 +15,13 @@ public abstract class BoardPrinter {
 
     protected String[][] createBoardRepresentation() {
         String[][] boardRepresentation = new String[8][8];
-        board.getPieces().forEach(piece -> populateBoardRepresentation(piece, boardRepresentation));
+        board.getPieces().forEach((position, piece) -> populateBoardRepresentation(position, piece, boardRepresentation));
         return boardRepresentation;
     }
 
-    private void populateBoardRepresentation(Piece piece, String[][] boardRepresentation) {
-        int col = columnToIndex(piece.getPosition().charAt(0));
-        int row = rowToIndex(piece.getPosition().charAt(1));
+    private void populateBoardRepresentation(String position, Piece piece, String[][] boardRepresentation) {
+        int col = columnToIndex(position.charAt(0));
+        int row = rowToIndex(position.charAt(1));
         boardRepresentation[row][col] = piece.getSymbol();
     }
 

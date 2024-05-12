@@ -4,8 +4,8 @@ import grim.readmechess.model.chesspieces.*;
 import grim.readmechess.utils.validator.MoveValidator;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static grim.readmechess.utils.common.Constants.BLACK;
 import static grim.readmechess.utils.common.Constants.WHITE;
@@ -14,7 +14,7 @@ import static grim.readmechess.utils.common.Constants.WHITE;
 public class Board {
 
     private final BoardState boardState;
-    private final List<Piece> pieces;
+    private final Map<String, Piece> pieces;
     private final MoveValidator moveValidator;
     private String selectedSquare;
 
@@ -22,10 +22,6 @@ public class Board {
         this.boardState = boardState;
         this.pieces = setupStartingPosition();
         this.moveValidator = moveValidator;
-    }
-
-    public void selectSquare(String square) {
-        this.selectedSquare = square.equals(this.selectedSquare) ? null : square;
     }
 
     public String getSelectedSquare() {
@@ -36,98 +32,174 @@ public class Board {
         return boardState;
     }
 
-    public List<Piece> getPieces() {
+    public Map<String, Piece> getPieces() {
         return pieces;
     }
 
-    List<Piece> setupStartingPosition() {
-        List<Piece> startingPieces = new ArrayList<>();
+    public void selectSquare(String square) {
+        this.selectedSquare = square.equals(this.selectedSquare) ? null : square;
+    }
+
+    public void makeMove(String move) {
+        validateMove(move);
+        handleMove(move);
+        updateBoardState(extractToSquare(move));
+    }
+
+    private Map<String, Piece> setupStartingPosition() {
+        Map<String, Piece> startingPieces = new HashMap<>();
         addPieces(startingPieces);
         return startingPieces;
     }
 
-    private void addPieces(List<Piece> pieces) {
-        pieces.add(new King(WHITE, "e1"));
-        pieces.add(new King(BLACK, "e8"));
-        pieces.add(new Queen(WHITE, "d1"));
-        pieces.add(new Queen(BLACK, "d8"));
-        pieces.add(new Rook(WHITE, "a1"));
-        pieces.add(new Rook(WHITE, "h1"));
-        pieces.add(new Rook(BLACK, "a8"));
-        pieces.add(new Rook(BLACK, "h8"));
-        pieces.add(new Knight(WHITE, "b1"));
-        pieces.add(new Knight(WHITE, "g1"));
-        pieces.add(new Knight(BLACK, "b8"));
-        pieces.add(new Knight(BLACK, "g8"));
-        pieces.add(new Bishop(WHITE, "c1"));
-        pieces.add(new Bishop(WHITE, "f1"));
-        pieces.add(new Bishop(BLACK, "c8"));
-        pieces.add(new Bishop(BLACK, "f8"));
+    private void addPieces(Map<String, Piece> pieces) {
+        addPawns(pieces);
+        addRooks(pieces);
+        addKnights(pieces);
+        addBishops(pieces);
+        addRoyals(pieces);
+    }
+
+    private void addPawns(Map<String, Piece> pieces) {
         for (char col = 'a'; col <= 'h'; col++) {
-            pieces.add(new Pawn(WHITE, "" + col + '2'));
-            pieces.add(new Pawn(BLACK, "" + col + '7'));
+            pieces.put("" + col + '2', new Pawn(WHITE));
+            pieces.put("" + col + '7', new Pawn(BLACK));
         }
     }
 
-    public void makeMove(String move) {
-        if (moveValidator.isValid(move)) {
-            String fromSquare = move.substring(0, 2);
-            String toSquare = move.substring(2, 4);
-            updateBoardState(fromSquare, toSquare);
-            movePiece(fromSquare, toSquare);
-        } else {
+    private void addRooks(Map<String, Piece> pieces) {
+        pieces.put("a1", new Rook(WHITE));
+        pieces.put("h1", new Rook(WHITE));
+        pieces.put("a8", new Rook(BLACK));
+        pieces.put("h8", new Rook(BLACK));
+    }
+
+    private void addKnights(Map<String, Piece> pieces) {
+        pieces.put("b1", new Knight(WHITE));
+        pieces.put("g1", new Knight(WHITE));
+        pieces.put("b8", new Knight(BLACK));
+        pieces.put("g8", new Knight(BLACK));
+    }
+
+    private void addBishops(Map<String, Piece> pieces) {
+        pieces.put("c1", new Bishop(WHITE));
+        pieces.put("f1", new Bishop(WHITE));
+        pieces.put("c8", new Bishop(BLACK));
+        pieces.put("f8", new Bishop(BLACK));
+    }
+
+    private void addRoyals(Map<String, Piece> pieces) {
+        pieces.put("e1", new King(WHITE));
+        pieces.put("e8", new King(BLACK));
+        pieces.put("d1", new Queen(WHITE));
+        pieces.put("d8", new Queen(BLACK));
+    }
+
+    private void validateMove(String move) {
+        if (!moveValidator.isValid(move)) {
             throw new IllegalArgumentException("Invalid move: " + move);
         }
     }
 
-    private void updateBoardState(String fromSquare, String toSquare) {
-        boardState.updateActiveColor();
-        boardState.resetEnPassantTarget();
-        boardState.updateCastlingRights(fromSquare);
-        boardState.updateHalfMoveClock(toSquare, pieces);
+    private void handleMove(String move) {
+        String fromSquare = extractFromSquare(move);
+        String toSquare = extractToSquare(move);
+        Piece piece = pieces.get(fromSquare);
+        if (piece instanceof Pawn) {
+            handlePawnMove(fromSquare, toSquare, move);
+        } else if (piece instanceof King && isCastlingMove(fromSquare, toSquare)) {
+            handleCastling(fromSquare, toSquare);
+        } else {
+            movePiece(fromSquare, toSquare);
+        }
+    }
+
+    private void updateBoardState(String toSquare) {
+        boolean capture = pieces.containsKey(toSquare);
+        boardState.update(toSquare, capture);
+    }
+
+    private void resetHalfMoveClock() {
+        boardState.setHalfMoveClock(0);
+    }
+
+    private void handlePawnMove(String fromSquare, String toSquare, String move) {
+        resetHalfMoveClock();
+        movePiece(fromSquare, toSquare);
+        if (isTwoStepVerticalMove(fromSquare, toSquare)) {
+            handleEnPassant(toSquare);
+        }
+        if (isPromotionSquare(toSquare)) {
+            promotePawn(toSquare, extractPromotionPiece(move));
+        }
+    }
+
+    private boolean isTwoStepVerticalMove(String fromSquare, String toSquare) {
+        return Math.abs(fromSquare.charAt(1) - toSquare.charAt(1)) == 2;
+    }
+
+    private void handleEnPassant(String toSquare) {
+        boardState.handleEnPassantTarget(toSquare);
+    }
+
+    private boolean isPromotionSquare(String position) {
+        String rank = position.substring(1);
+        return "1".equals(rank) || "8".equals(rank);
+    }
+
+    private void promotePawn(String position, String newPieceType) {
+        Piece pawn = pieces.remove(position);
+        Piece newPiece = createPieceByType(pawn.getColor(), newPieceType);
+        pieces.put(position, newPiece);
     }
 
     private void movePiece(String fromSquare, String toSquare) {
-        Piece piece = findPiece(fromSquare);
-        if (piece != null) {
-            movePieceToPosition(piece, toSquare);
-            handleSpecialMoves(piece, fromSquare, toSquare);
-        }
+        Piece piece = pieces.remove(fromSquare);
+        pieces.put(toSquare, piece);
     }
 
-    private Piece findPiece(String fromSquare) {
-        for (Piece piece : pieces) {
-            if (piece.getPosition().equals(fromSquare)) {
-                return piece;
-            }
-        }
-        return null;
+    private String extractFromSquare(String move) {
+        return move.substring(0, 2);
     }
 
-    private void movePieceToPosition(Piece piece, String toSquare) {
-        piece.setPosition(toSquare);
+    private String extractToSquare(String move) {
+        return move.substring(2, 4);
     }
 
-    private void handleSpecialMoves(Piece piece, String fromSquare, String toSquare) {
-        if (piece instanceof Pawn) {
-            handlePawnMove(fromSquare, toSquare);
-        } else if (isCastlingMove(piece, fromSquare, toSquare)) {
-            handleCastling(toSquare);
-        }
+    private boolean isCastlingMove(String fromSquare, String toSquare) {
+        return isTwoStepHorizontalMove(fromSquare, toSquare);
     }
 
-    private void handlePawnMove(String fromSquare, String toSquare) {
-        boardState.setHalfMoveClock(0);
-        boardState.handleEnPassantTarget(fromSquare, toSquare);
+    private boolean isTwoStepHorizontalMove(String fromSquare, String toSquare) {
+        return Math.abs(fromSquare.charAt(0) - toSquare.charAt(0)) == 2;
     }
 
-    private boolean isCastlingMove(Piece piece, String fromSquare, String toSquare) {
-        return piece instanceof King && Math.abs(fromSquare.charAt(0) - toSquare.charAt(0)) == 2;
+    private Piece createPieceByType(String color, String type) {
+        return switch (type) {
+            case "Q" -> new Queen(color);
+            case "R" -> new Rook(color);
+            case "B" -> new Bishop(color);
+            case "N" -> new Knight(color);
+            default -> throw new IllegalArgumentException("Illegal promotion piece: " + type);
+        };
     }
 
-    private void handleCastling(String toSquare) {
-        String rookFromSquare = (toSquare.charAt(0) == 'g' ? "h" : "a") + toSquare.charAt(1);
-        String rookToSquare = (toSquare.charAt(0) == 'g' ? "f" : "d") + toSquare.charAt(1);
+    private void handleCastling(String fromSquare, String toSquare) {
+        String rookFromSquare = determineRookOriginalSquare(toSquare);
+        String rookToSquare = determineRookDestinationSquare(toSquare);
+        movePiece(fromSquare, toSquare);
         movePiece(rookFromSquare, rookToSquare);
+    }
+
+    private String determineRookOriginalSquare(String toSquare) {
+        return (toSquare.charAt(0) == 'g' ? "h" : "a") + toSquare.charAt(1);
+    }
+
+    private String determineRookDestinationSquare(String toSquare) {
+        return (toSquare.charAt(0) == 'g' ? "f" : "d") + toSquare.charAt(1);
+    }
+
+    private String extractPromotionPiece(String move) {
+        return String.valueOf(move.charAt(4)).toUpperCase();
     }
 }

@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-import static grim.readmechess.utils.common.Constants.PATH_TO_ENGINE;
-
 @Service
 public class ControllerService {
 
@@ -25,7 +23,7 @@ public class ControllerService {
         this.markdownBoardPrinter = markdownBoardPrinter;
         this.engineService = engineService;
         try {
-            this.engineService.startEngine(PATH_TO_ENGINE);
+            this.engineService.startEngine("src/main/resources/stockfish.exe");
         } catch (IOException e) {
             throw new RuntimeException("Error starting engine service", e);
         }
