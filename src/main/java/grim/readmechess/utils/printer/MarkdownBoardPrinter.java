@@ -9,8 +9,6 @@ import java.util.stream.IntStream;
 
 @Component
 public class MarkdownBoardPrinter extends BoardPrinter {
-    private static final String MARKDOWN_HEADER = "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |";
-    private static final String MARKDOWN_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
 
     private final MoveValidator moveValidator;
 
@@ -25,7 +23,10 @@ public class MarkdownBoardPrinter extends BoardPrinter {
     }
 
     private String convertBoardToMarkdown() {
-        return MARKDOWN_HEADER + "\n" + MARKDOWN_SEPARATOR + "\n" + formatBoardRepresentation(createBoardRepresentation());
+        String header = "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |\n";
+        String separator = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
+        String boardRepresentation = formatBoardRepresentation(createBoardRepresentation());
+        return header + separator + boardRepresentation;
     }
 
     private String formatBoardRepresentation(String[][] boardRepresentation) {
