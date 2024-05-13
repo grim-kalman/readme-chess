@@ -16,9 +16,10 @@ public class Controller {
     private final ControllerService controllerService;
     private final GithubService githubService;
 
-    public Controller(ControllerService controllerService, GithubService githubService) {
+    public Controller(ControllerService controllerService, GithubService githubService) throws Exception {
         this.controllerService = controllerService;
         this.githubService = githubService;
+        this.githubService.updateReadme();
     }
 
     @GetMapping("/play")
