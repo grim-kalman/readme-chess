@@ -1,6 +1,8 @@
 package grim.readmechess.utils.printer;
 
 import grim.readmechess.model.chessboard.Board;
+import grim.readmechess.model.chesspieces.Pawn;
+import grim.readmechess.model.chesspieces.Piece;
 import grim.readmechess.utils.validator.MoveValidator;
 import org.springframework.stereotype.Component;
 
@@ -47,10 +49,14 @@ public class MarkdownBoardPrinter extends BoardPrinter {
 
     private String convertSquareToMarkdown(String square, String position) {
         String selectedSquare = board.getSelectedSquare();
+        Piece selectedPiece = board.getPieces().get(selectedSquare);
         String squareSymbol = formatSquareSymbol(square);
 
-        if (selectedSquare != null && moveValidator.isValid(selectedSquare + position)) {
-            return createMarkdownLink(squareSymbol, "http://localhost:8080/api/chess/play?move=" + selectedSquare + position);
+        if (selectedSquare != null) {
+            String move = formatMove(selectedPiece, selectedSquare + position, position);
+            if (moveValidator.isValid(move)) {
+                return createMarkdownLink(squareSymbol, "http://localhost:8080/api/chess/play?move=" + move);
+            }
         }
         if (moveValidator.isStartOfValidMove(position)) {
             return createMarkdownLink(squareSymbol, "http://localhost:8080/api/chess/select?square=" + position);
@@ -62,6 +68,13 @@ public class MarkdownBoardPrinter extends BoardPrinter {
             return createMarkdownLink(squareSymbol, "https://github.com/grim-kalman");
         }
         return squareSymbol;
+    }
+
+    String formatMove(Piece piece, String move, String position) {
+        if (piece instanceof Pawn && position.endsWith("8")) {
+            return move + "q";
+        }
+        return move;
     }
 
     private String formatSquareSymbol(String square) {

@@ -38,7 +38,7 @@ public class EngineService {
     }
 
     String getBestMove() {
-        sendCommand("go depth 16");
+        sendCommand("go depth 8");
         return readEngineOutput("bestmove")
                 .map(line -> line.split(" ")[1])
                 .orElseThrow(() -> new RuntimeException("Best move not found"));
