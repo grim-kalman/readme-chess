@@ -107,7 +107,7 @@ public class Board {
         Piece piece = pieces.get(fromSquare);
         if (piece instanceof Pawn) {
             handlePawnMove(fromSquare, toSquare);
-        } else if (piece instanceof King && isCastlingMove(fromSquare, toSquare)) {
+        } else if (isCastlingMove(piece, fromSquare, toSquare)) {
             handleCastling(fromSquare, toSquare);
         } else {
             movePiece(fromSquare, toSquare);
@@ -166,8 +166,8 @@ public class Board {
         return move.substring(2, 4);
     }
 
-    private boolean isCastlingMove(String fromSquare, String toSquare) {
-        return isTwoStepHorizontalMove(fromSquare, toSquare);
+    private boolean isCastlingMove(Piece piece, String fromSquare, String toSquare) {
+        return piece instanceof King && isTwoStepHorizontalMove(fromSquare, toSquare);
     }
 
     private boolean isTwoStepHorizontalMove(String fromSquare, String toSquare) {
