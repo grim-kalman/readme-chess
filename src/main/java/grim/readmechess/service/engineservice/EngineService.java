@@ -32,13 +32,15 @@ public class EngineService {
         sendCommand("position fen " + fen);
     }
 
+    // TODO: Implement game over condition, we need to check with the computer if the game is over for player
     public EngineResponseDTO getEngineResponse() {
         String bestMove = getBestMove();
+        System.out.println("Is game over: " + bestMove.equals("(none)") + "Best move: " + bestMove + " Evaluation: " + getEvaluation());
         return new EngineResponseDTO(bestMove, getEvaluation(), "(none)".equals(bestMove));
     }
 
     String getBestMove() {
-        sendCommand("go depth 8");
+        sendCommand("go depth 16");
         return readEngineOutput("bestmove")
                 .map(line -> line.split(" ")[1])
                 .orElseThrow(() -> new RuntimeException("Best move not found"));
