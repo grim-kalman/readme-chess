@@ -4,6 +4,7 @@ import grim.readmechess.model.chessboard.Board;
 import grim.readmechess.model.chesspieces.Pawn;
 import grim.readmechess.model.chesspieces.Piece;
 import grim.readmechess.utils.validator.MoveValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ public class MarkdownBoardPrinter extends BoardPrinter {
 
     private final MoveValidator moveValidator;
 
+    @Autowired
     public MarkdownBoardPrinter(Board board, MoveValidator moveValidator) {
         super(board);
         this.moveValidator = moveValidator;
