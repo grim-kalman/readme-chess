@@ -12,9 +12,9 @@ import java.util.Optional;
 
 @Service
 public class EngineService {
+
     private BufferedReader output;
     private PrintWriter input;
-
     private Double lastEvaluation;
 
     public void startEngine(String pathToEngine) throws IOException {

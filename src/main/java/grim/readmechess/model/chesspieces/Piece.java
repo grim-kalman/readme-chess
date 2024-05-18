@@ -1,5 +1,8 @@
 package grim.readmechess.model.chesspieces;
 
+import lombok.Getter;
+
+@Getter
 public abstract class Piece {
 
     private final String color;
@@ -10,11 +13,4 @@ public abstract class Piece {
         this.symbol = symbol;
     }
 
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public String getColor() {
-        return color;
-    }
 }
