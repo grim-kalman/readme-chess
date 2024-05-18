@@ -1,15 +1,14 @@
 package grim.readmechess.utils.validator;
 
 import grim.readmechess.service.engineservice.EngineService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class MoveValidator {
-    private final EngineService engineService;
 
-    public MoveValidator(EngineService engineService) {
-        this.engineService = engineService;
-    }
+    private final EngineService engineService;
 
     public boolean isValid(String move) {
         return this.engineService.getValidMoves().contains(move);

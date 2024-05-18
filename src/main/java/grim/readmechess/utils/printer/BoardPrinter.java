@@ -2,13 +2,16 @@ package grim.readmechess.utils.printer;
 
 import grim.readmechess.model.chessboard.Board;
 import grim.readmechess.model.chesspieces.Piece;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static grim.readmechess.utils.common.Utils.columnToIndex;
 import static grim.readmechess.utils.common.Utils.rowToIndex;
 
 public abstract class BoardPrinter {
+
     protected final Board board;
 
+    @Autowired
     protected BoardPrinter(Board board) {
         this.board = board;
     }
