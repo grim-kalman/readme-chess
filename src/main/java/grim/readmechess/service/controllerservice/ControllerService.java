@@ -6,12 +6,8 @@ import grim.readmechess.utils.printer.FenBoardPrinter;
 import grim.readmechess.utils.printer.MarkdownBoardPrinter;
 import grim.readmechess.service.engineservice.EngineService;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,21 +18,26 @@ public class ControllerService {
     private final MarkdownBoardPrinter markdownBoardPrinter;
     private final EngineService engineService;
 
-    @Value("${chess.engine.path}")
-    private String enginePath;
-
-    @PostConstruct
-    public void initialize() throws IOException {
-        engineService.startEngine(enginePath);
-    }
-
     public void play(String move) {
-        makeMove(move);
-        makeMove(getEngineResponse().bestMove());
+        EngineResponseDTO response = makeMove(move);
+        if (response.isGameOver()) {
+            // TODO: Implement banter and trashtalk.
+            System.out.println("Game over");
+        }
+
+        response = makeMove(getEngineResponse().bestMove());
+        if (response.isGameOver()) {
+            System.out.println("Game over");
+        }
     }
 
     public void select(String square) {
         board.selectSquare(square);
+    }
+
+    public void newGame() {
+        board.reset();
+        engineService.updateEngineState(fenBoardPrinter.print());
     }
 
     public String printBoard() {
@@ -47,8 +48,9 @@ public class ControllerService {
         return engineService.getEngineResponse();
     }
 
-    private void makeMove(String move) {
+    private EngineResponseDTO makeMove(String move) {
         board.makeMove(move);
         engineService.updateEngineState(fenBoardPrinter.print());
+        return engineService.getEngineResponse();
     }
 }

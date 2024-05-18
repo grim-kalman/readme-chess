@@ -29,8 +29,9 @@ public class MarkdownBoardPrinter extends BoardPrinter {
     private String convertBoardToMarkdown() {
         String header = "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |\n";
         String separator = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
-        String boardRepresentation = formatBoardRepresentation(createBoardRepresentation());
-        return header + separator + boardRepresentation;
+        String boardRepresentation = formatBoardRepresentation(createBoardRepresentation()) + "\n";
+        String newGameButton = "[![New Game](https://img.shields.io/badge/new_game-4CAF50)](http://localhost:8080/api/chess/new)";
+        return header + separator + boardRepresentation + newGameButton;
     }
 
     private String formatBoardRepresentation(String[][] boardRepresentation) {

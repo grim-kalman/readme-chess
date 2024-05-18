@@ -3,7 +3,6 @@ package grim.readmechess.controller;
 import grim.readmechess.service.controllerservice.ControllerService;
 import grim.readmechess.service.githubservice.GithubService;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,14 +22,10 @@ public class Controller {
     @Value("${github.url}")
     private String githubUrl;
 
-    @PostConstruct
-    public void initialize() throws Exception {
-        githubService.updateReadme();
-    }
-
     @GetMapping("/play")
     public RedirectView play(@RequestParam String move) throws Exception {
         controllerService.play(move);
+        // TODO: remove these updates to the githubservice or play method?
         githubService.updateReadme();
         return new RedirectView(githubUrl);
     }
@@ -38,6 +33,13 @@ public class Controller {
     @GetMapping("/select")
     public RedirectView select(@RequestParam String square) throws Exception {
         controllerService.select(square);
+        githubService.updateReadme();
+        return new RedirectView(githubUrl);
+    }
+
+    @GetMapping("/new")
+    public RedirectView newGame() throws Exception {
+        controllerService.newGame();
         githubService.updateReadme();
         return new RedirectView(githubUrl);
     }

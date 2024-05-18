@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grim.readmechess.service.controllerservice.ControllerService;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -38,6 +39,11 @@ public class GithubService {
     private final ControllerService controllerService;
     private final RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @PostConstruct
+    public void initialize() throws Exception {
+        updateReadme();
+    }
 
     public void updateReadme() throws Exception {
         String latestCommitSha = getLatestCommitSha();

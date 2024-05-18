@@ -1,6 +1,5 @@
 package grim.readmechess.model.chessboard;
 
-import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,13 +19,12 @@ public class BoardState {
     private int halfMoveClock;
     private int fullMoveNumber;
 
-    @PostConstruct
-    public void initialize() {
-        this.activeColor = WHITE;
-        this.castlingAvailability = "KQkq";
-        this.enPassantTarget = "-";
-        this.halfMoveClock = 0;
-        this.fullMoveNumber = 1;
+    public void reset() {
+        activeColor = WHITE;
+        castlingAvailability = "KQkq";
+        enPassantTarget = "-";
+        halfMoveClock = 0;
+        fullMoveNumber = 1;
     }
 
     public void update(String fromSquare, boolean capture) {
