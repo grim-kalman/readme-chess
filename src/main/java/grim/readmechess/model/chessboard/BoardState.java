@@ -1,52 +1,32 @@
 package grim.readmechess.model.chessboard;
 
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import static grim.readmechess.utils.common.Constants.*;
 
 @Component
+@NoArgsConstructor
+@Getter
 public class BoardState {
 
     private String activeColor;
     private String castlingAvailability;
     private String enPassantTarget;
+    @Setter
     private int halfMoveClock;
     private int fullMoveNumber;
 
-    public BoardState() {
-        reset();
-    }
-
-    public void reset() {
+    @PostConstruct
+    public void initialize() {
         this.activeColor = WHITE;
         this.castlingAvailability = "KQkq";
         this.enPassantTarget = "-";
         this.halfMoveClock = 0;
         this.fullMoveNumber = 1;
-    }
-
-    public String getActiveColor() {
-        return activeColor;
-    }
-
-    public String getCastlingAvailability() {
-        return castlingAvailability;
-    }
-
-    public String getEnPassantTarget() {
-        return enPassantTarget;
-    }
-
-    public int getHalfMoveClock() {
-        return halfMoveClock;
-    }
-
-    public void setHalfMoveClock(int clock) {
-        this.halfMoveClock = clock;
-    }
-
-    public int getFullMoveNumber() {
-        return fullMoveNumber;
     }
 
     public void update(String fromSquare, boolean capture) {

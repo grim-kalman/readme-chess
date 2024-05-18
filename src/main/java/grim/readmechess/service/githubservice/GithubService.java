@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import grim.readmechess.service.controllerservice.ControllerService;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,29 +18,26 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class GithubService {
-    private static final String GITHUB_API_URL = "https://api.github.com/repos";
-    private static final String README_PATH = "README.md";
-    private static final String BRANCH = "main";
+    @Value("${github.api.url}")
+    private String githubApiUrl;
 
-    @Value("${github.owner}")
-    private String owner;
+    @Value("${github.readme.path}")
+    private String readmePath;
 
-    @Value("${github.repo}")
-    private String repo;
+    @Value("${github.branch}")
+    private String branch;
+
+    @Value("${github.owner.repo}")
+    private String ownerRepo;
 
     @Value("${github.token}")
     private String token;
 
     private final ControllerService controllerService;
-    private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
-
-    public GithubService(ControllerService controllerService) {
-        this.controllerService = controllerService;
-        this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
-        this.objectMapper = new ObjectMapper();
-    }
+    private final RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void updateReadme() throws Exception {
         String latestCommitSha = getLatestCommitSha();
@@ -65,7 +63,7 @@ public class GithubService {
     }
 
     private JsonNode handleRequest(String endpoint, HttpMethod method, HttpEntity<String> request) throws Exception {
-        String url = GITHUB_API_URL + "/" + owner + "/" + repo + "/" + endpoint;
+        String url = githubApiUrl + "/" + ownerRepo + "/" + ownerRepo + "/" + endpoint;
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, method, request, String.class);
         return objectMapper.readTree(responseEntity.getBody());
     }
@@ -90,7 +88,7 @@ public class GithubService {
         return objectMapper.writeValueAsString(Map.of(
                 "base_tree", latestCommitSha,
                 "tree", List.of(Map.of(
-                        "path", README_PATH,
+                        "path", readmePath,
                         "mode", "100644",
                         "type", "blob",
                         "content", newBoardState))));
@@ -105,6 +103,6 @@ public class GithubService {
 
     private void updateRefWithNewCommit(String newCommitSha) throws Exception {
         String json = objectMapper.writeValueAsString(Map.of("sha", newCommitSha));
-        handleRequest("git/refs/heads/" + BRANCH, HttpMethod.PATCH, new HttpEntity<>(json, createHeaders()));
+        handleRequest("git/refs/heads/" + branch, HttpMethod.PATCH, new HttpEntity<>(json, createHeaders()));
     }
 }

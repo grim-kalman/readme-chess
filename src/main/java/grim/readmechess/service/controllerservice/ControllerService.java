@@ -5,11 +5,16 @@ import grim.readmechess.model.chessboard.Board;
 import grim.readmechess.utils.printer.FenBoardPrinter;
 import grim.readmechess.utils.printer.MarkdownBoardPrinter;
 import grim.readmechess.service.engineservice.EngineService;
+
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
 @Service
+@RequiredArgsConstructor
 public class ControllerService {
 
     private final Board board;
@@ -17,16 +22,12 @@ public class ControllerService {
     private final MarkdownBoardPrinter markdownBoardPrinter;
     private final EngineService engineService;
 
-    public ControllerService(Board board, FenBoardPrinter fenBoardPrinter, MarkdownBoardPrinter markdownBoardPrinter, EngineService engineService) {
-        this.board = board;
-        this.fenBoardPrinter = fenBoardPrinter;
-        this.markdownBoardPrinter = markdownBoardPrinter;
-        this.engineService = engineService;
-        try {
-            this.engineService.startEngine("src/main/resources/stockfish.exe");
-        } catch (IOException e) {
-            throw new RuntimeException("Error starting engine service", e);
-        }
+    @Value("${chess.engine.path}")
+    private String enginePath;
+
+    @PostConstruct
+    public void initialize() throws IOException {
+        engineService.startEngine(enginePath);
     }
 
     public void play(String move) {

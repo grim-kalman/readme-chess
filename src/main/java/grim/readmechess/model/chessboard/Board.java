@@ -1,39 +1,29 @@
 package grim.readmechess.model.chessboard;
 
 import grim.readmechess.model.chesspieces.*;
+import grim.readmechess.service.boardservice.BoardService;
 import grim.readmechess.utils.validator.MoveValidator;
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import static grim.readmechess.utils.common.Constants.BLACK;
-import static grim.readmechess.utils.common.Constants.WHITE;
-
 @Component
+@RequiredArgsConstructor
+@Getter
 public class Board {
 
     private final BoardState boardState;
-    private final Map<String, Piece> pieces;
     private final MoveValidator moveValidator;
+    private final BoardService boardService;
+    private Map<String, Piece> pieces;
     private String selectedSquare;
 
-    public Board(BoardState boardState, MoveValidator moveValidator) {
-        this.boardState = boardState;
-        this.pieces = setupStartingPosition();
-        this.moveValidator = moveValidator;
-    }
-
-    public String getSelectedSquare() {
-        return selectedSquare;
-    }
-
-    public BoardState getBoardState() {
-        return boardState;
-    }
-
-    public Map<String, Piece> getPieces() {
-        return pieces;
+    @PostConstruct
+    public void initialize() {
+        this.pieces = boardService.setupPieces();
     }
 
     public void selectSquare(String square) {
@@ -44,55 +34,6 @@ public class Board {
         validateMove(move);
         handleMove(move);
         updateBoardState(extractToSquare(move));
-    }
-
-    private Map<String, Piece> setupStartingPosition() {
-        Map<String, Piece> startingPieces = new HashMap<>();
-        addPieces(startingPieces);
-        return startingPieces;
-    }
-
-    private void addPieces(Map<String, Piece> pieces) {
-        addPawns(pieces);
-        addRooks(pieces);
-        addKnights(pieces);
-        addBishops(pieces);
-        addRoyals(pieces);
-    }
-
-    private void addPawns(Map<String, Piece> pieces) {
-        for (char col = 'a'; col <= 'h'; col++) {
-            pieces.put("" + col + '2', new Pawn(WHITE));
-            pieces.put("" + col + '7', new Pawn(BLACK));
-        }
-    }
-
-    private void addRooks(Map<String, Piece> pieces) {
-        pieces.put("a1", new Rook(WHITE));
-        pieces.put("h1", new Rook(WHITE));
-        pieces.put("a8", new Rook(BLACK));
-        pieces.put("h8", new Rook(BLACK));
-    }
-
-    private void addKnights(Map<String, Piece> pieces) {
-        pieces.put("b1", new Knight(WHITE));
-        pieces.put("g1", new Knight(WHITE));
-        pieces.put("b8", new Knight(BLACK));
-        pieces.put("g8", new Knight(BLACK));
-    }
-
-    private void addBishops(Map<String, Piece> pieces) {
-        pieces.put("c1", new Bishop(WHITE));
-        pieces.put("f1", new Bishop(WHITE));
-        pieces.put("c8", new Bishop(BLACK));
-        pieces.put("f8", new Bishop(BLACK));
-    }
-
-    private void addRoyals(Map<String, Piece> pieces) {
-        pieces.put("e1", new King(WHITE));
-        pieces.put("e8", new King(BLACK));
-        pieces.put("d1", new Queen(WHITE));
-        pieces.put("d8", new Queen(BLACK));
     }
 
     private void validateMove(String move) {
