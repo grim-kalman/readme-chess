@@ -23,7 +23,12 @@ public class Board {
 
     @PostConstruct
     public void initialize() {
+        reset();
+    }
+
+    public void reset() {
         this.pieces = boardService.setupPieces();
+        this.boardState.reset();
     }
 
     public void selectSquare(String square) {

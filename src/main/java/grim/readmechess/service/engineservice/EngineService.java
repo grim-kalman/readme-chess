@@ -1,6 +1,8 @@
 package grim.readmechess.service.engineservice;
 
 import grim.readmechess.service.engineservice.dto.EngineResponseDTO;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -13,12 +15,16 @@ import java.util.Optional;
 @Service
 public class EngineService {
 
+    @Value("${chess.engine.path}")
+    private String enginePath;
+
     private BufferedReader output;
     private PrintWriter input;
     private Double lastEvaluation;
 
-    public void startEngine(String pathToEngine) throws IOException {
-        Process engineProcess = new ProcessBuilder(pathToEngine).start();
+    @PostConstruct
+    public void initialize() throws IOException {
+        Process engineProcess = new ProcessBuilder(enginePath).start();
         output = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
         input = new PrintWriter(engineProcess.getOutputStream(), true);
         lastEvaluation = getEvaluation();
@@ -32,10 +38,8 @@ public class EngineService {
         sendCommand("position fen " + fen);
     }
 
-    // TODO: Implement game over condition, we need to check with the computer if the game is over for player
     public EngineResponseDTO getEngineResponse() {
         String bestMove = getBestMove();
-        System.out.println("Is game over: " + bestMove.equals("(none)") + "Best move: " + bestMove + " Evaluation: " + getEvaluation());
         return new EngineResponseDTO(bestMove, getEvaluation(), "(none)".equals(bestMove));
     }
 
