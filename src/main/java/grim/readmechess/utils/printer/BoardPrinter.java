@@ -18,7 +18,7 @@ public abstract class BoardPrinter {
 
     protected String[][] createBoardRepresentation() {
         String[][] boardRepresentation = new String[8][8];
-        board.getPieces().forEach((position, piece) -> populateBoardRepresentation(position, piece, boardRepresentation));
+        board.getPieceService().getPieces().forEach((position, piece) -> populateBoardRepresentation(position, piece, boardRepresentation));
         return boardRepresentation;
     }
 

@@ -1,8 +1,9 @@
 package grim.readmechess.service.engineservice;
 
+import grim.readmechess.config.AppConfig;
 import grim.readmechess.service.engineservice.dto.EngineResponseDTO;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -13,21 +14,27 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class EngineService {
 
-    @Value("${chess.engine.path}")
-    private String enginePath;
-
+    private final AppConfig appConfig;
+    private Process engineProcess;
     private BufferedReader output;
     private PrintWriter input;
     private Double lastEvaluation;
 
-    @PostConstruct
-    public void initialize() throws IOException {
-        Process engineProcess = new ProcessBuilder(enginePath).start();
+    public void startEngine() throws IOException {
+        engineProcess = new ProcessBuilder(appConfig.getEnginePath()).start();
         output = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
         input = new PrintWriter(engineProcess.getOutputStream(), true);
         lastEvaluation = getEvaluation();
+    }
+
+    public void stopEngine() throws IOException {
+        sendCommand("quit");
+        output.close();
+        input.close();
+        engineProcess.destroy();
     }
 
     public void sendCommand(String command) {
@@ -39,18 +46,17 @@ public class EngineService {
     }
 
     public EngineResponseDTO getEngineResponse() {
-        String bestMove = getBestMove();
+        String bestMove = getBestMove().orElseThrow(() -> new RuntimeException("No best move found"));
         return new EngineResponseDTO(bestMove, getEvaluation(), "(none)".equals(bestMove));
     }
 
-    String getBestMove() {
+    private Optional<String> getBestMove() {
         sendCommand("go depth 16");
         return readEngineOutput("bestmove")
-                .map(line -> line.split(" ")[1])
-                .orElseThrow(() -> new RuntimeException("Best move not found"));
+                .map(line -> line.split(" ")[1]);
     }
 
-    Double getEvaluation() {
+    private Double getEvaluation() {
         sendCommand("eval");
         return lastEvaluation = readEngineOutput("NNUE evaluation")
                 .map(line -> line.replaceAll("[^0-9.-]", ""))
