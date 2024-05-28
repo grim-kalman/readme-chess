@@ -1,34 +1,34 @@
 package grim.readmechess.model.chessboard;
 
 import grim.readmechess.model.chesspieces.*;
-import grim.readmechess.service.boardservice.BoardService;
+import grim.readmechess.service.pieceservice.PieceService;
 import grim.readmechess.utils.validator.MoveValidator;
+
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 @Getter
 public class Board {
 
-    private final BoardState boardState;
-    private final MoveValidator moveValidator;
-    private final BoardService boardService;
-    private Map<String, Piece> pieces;
     private String selectedSquare;
+    private final BoardState boardState;
+    private final PieceService pieceService;
+    private final MoveValidator moveValidator;
+
 
     @PostConstruct
-    public void initialize() {
+    public void init() {
         reset();
     }
 
     public void reset() {
-        this.pieces = boardService.setupPieces();
+        this.selectedSquare = null;
         this.boardState.reset();
+        this.pieceService.reset();
     }
 
     public void selectSquare(String square) {
@@ -50,7 +50,7 @@ public class Board {
     private void handleMove(String move) {
         String fromSquare = extractFromSquare(move);
         String toSquare = extractToSquare(move);
-        Piece piece = pieces.get(fromSquare);
+        Piece piece = pieceService.getPieces().get(fromSquare);
         if (piece instanceof Pawn) {
             handlePawnMove(fromSquare, toSquare);
         } else if (isCastlingMove(piece, fromSquare, toSquare)) {
@@ -61,7 +61,7 @@ public class Board {
     }
 
     private void updateBoardState(String toSquare) {
-        boolean capture = pieces.containsKey(toSquare);
+        boolean capture = pieceService.getPieces().containsKey(toSquare);
         boardState.update(toSquare, capture);
     }
 
@@ -94,14 +94,14 @@ public class Board {
     }
 
     private void promotePawn(String position) {
-        Piece pawn = pieces.remove(position);
+        Piece pawn = pieceService.getPieces().remove(position);
         Piece newPiece = new Queen(pawn.getColor());
-        pieces.put(position, newPiece);
+        pieceService.getPieces().put(position, newPiece);
     }
 
     private void movePiece(String fromSquare, String toSquare) {
-        Piece piece = pieces.remove(fromSquare);
-        pieces.put(toSquare, piece);
+        Piece piece = pieceService.getPieces().remove(fromSquare);
+        pieceService.getPieces().put(toSquare, piece);
     }
 
     private String extractFromSquare(String move) {

@@ -52,7 +52,7 @@ public class MarkdownBoardPrinter extends BoardPrinter {
 
     private String convertSquareToMarkdown(String square, String position) {
         String selectedSquare = board.getSelectedSquare();
-        Piece selectedPiece = board.getPieces().get(selectedSquare);
+        Piece selectedPiece = board.getPieceService().getPieces().get(selectedSquare);
         String squareSymbol = formatSquareSymbol(square);
 
         if (selectedSquare != null) {

@@ -1,6 +1,7 @@
-package grim.readmechess.service.boardservice;
+package grim.readmechess.service.pieceservice;
 
 import grim.readmechess.model.chesspieces.*;
+import lombok.Getter;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -10,7 +11,14 @@ import static grim.readmechess.utils.common.Constants.BLACK;
 import static grim.readmechess.utils.common.Constants.WHITE;
 
 @Service
-public class BoardService {
+@Getter
+public class PieceService {
+
+    private Map<String, Piece> pieces;
+
+    public void reset() {
+        this.pieces = setupPieces();
+    }
 
     public Map<String, Piece> setupPieces() {
         Map<String, Piece> startingPieces = new HashMap<>();

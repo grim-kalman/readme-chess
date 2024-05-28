@@ -1,11 +1,11 @@
 package grim.readmechess.model.chessboard;
 
+import static grim.readmechess.utils.common.Constants.*;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
-
-import static grim.readmechess.utils.common.Constants.*;
 
 @Component
 @NoArgsConstructor
