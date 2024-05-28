@@ -10,25 +10,25 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 @Getter
 public class AppConfig {
-    @Value("${chess.engine.path}")
+    @Value("${chess.engine.path:#{systemEnvironment['chess.engine.path']}}")
     private String enginePath;
 
-    @Value("${github.api.url}")
+    @Value("${github.api.url:#{systemEnvironment['github.api.url']}}")
     private String githubApiUrl;
 
-    @Value("${github.url}")
+    @Value("${github.url:#{systemEnvironment['github.url']}}")
     private String githubUrl;
 
-    @Value("${github.readme.path}")
+    @Value("${github.readme.path:#{systemEnvironment['github.readme.path']}}")
     private String readmePath;
 
-    @Value("${github.branch}")
+    @Value("${github.branch:#{systemEnvironment['github.branch']}}")
     private String branch;
 
-    @Value("${github.owner.repo}")
+    @Value("${github.owner.repo:#{systemEnvironment['github.owner.repo']}}")
     private String ownerRepo;
 
-    @Value("${github.token}")
+    @Value("${github.token:#{systemEnvironment['github.token']}}")
     private String token;
 
     @Bean
