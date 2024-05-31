@@ -4,6 +4,7 @@ import grim.readmechess.config.AppConfig;
 import grim.readmechess.service.chessservice.ChessService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -14,6 +15,11 @@ public class Controller {
 
     private final AppConfig appConfig;
     private final ChessService chessService;
+
+    @GetMapping("/status")
+    public ResponseEntity<String> getStatus() {
+        return ResponseEntity.ok("Application is running");
+    }
 
     @GetMapping("/play")
     public RedirectView play(@RequestParam String move) throws Exception {
