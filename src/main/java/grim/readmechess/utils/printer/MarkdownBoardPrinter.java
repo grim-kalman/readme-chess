@@ -58,11 +58,11 @@ public class MarkdownBoardPrinter extends BoardPrinter {
         if (selectedSquare != null) {
             String move = formatMove(selectedPiece, selectedSquare + position, position);
             if (moveValidator.isValid(move)) {
-                return createMarkdownLink(squareSymbol, "https://readme-chess.azurewebsites.net/api/chess/play?move=" + move);
+                return createMarkdownLink(squareSymbol, "http://localhost:8080/api/chess/play?move=" + move);
             }
         }
         if (moveValidator.isStartOfValidMove(position)) {
-            return createMarkdownLink(squareSymbol, "https://readme-chess.azurewebsites.net/api/chess/select?square=" + position);
+            return createMarkdownLink(squareSymbol, "http://localhost:8080/api/chess/select?square=" + position);
         }
         if (square == null) {
             return " ";

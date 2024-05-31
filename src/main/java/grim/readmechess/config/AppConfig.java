@@ -10,14 +10,12 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 @Getter
 public class AppConfig {
-    @Value("${chess.engine.path}")
-    private String enginePath;
-
-    @Value("${github.api.url}")
-    private String githubApiUrl;
 
     @Value("${github.url}")
     private String githubUrl;
+
+    @Value("${github.api.url}")
+    private String githubApiUrl;
 
     @Value("${github.readme.path}")
     private String readmePath;
@@ -30,6 +28,9 @@ public class AppConfig {
 
     @Value("${github.token}")
     private String token;
+
+    @Value("${chess.engine.path}")
+    private String enginePath;
 
     @Bean
     public RestTemplate restTemplate() {
