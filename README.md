@@ -1,6 +1,6 @@
 # Readme Chess
 
-Readme Chess is a Java-based web application built with Spring Boot and Maven. The application allows users to play a game of chess, with the game state being updated and displayed in the profile README on GitHub.
+Readme Chess is a Java-based web application built with Spring Boot and Maven, deployed on Azure. The application allows users to play a game of chess, with the game state being updated and displayed in the profile README on GitHub.
 
 ## How It Works
 
