@@ -30,7 +30,7 @@ public class MarkdownBoardPrinter extends BoardPrinter {
         String header = "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |\n";
         String separator = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
         String boardRepresentation = formatBoardRepresentation(createBoardRepresentation()) + "\n";
-        String newGameButton = "[![New Game](https://img.shields.io/badge/new_game-4CAF50)](https://readme-chess.azurewebsites.net/api/chess/new)";
+        String newGameButton = "[![New Game](https://img.shields.io/badge/new_game-4CAF50)](https://readme-chess.azurewebsites.net/new)";
         return header + separator + boardRepresentation + newGameButton;
     }
 
