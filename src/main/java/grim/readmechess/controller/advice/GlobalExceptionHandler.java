@@ -19,19 +19,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = {IllegalArgumentException.class})
     public RedirectView handleIllegalArgumentException(IllegalArgumentException e) {
-        log.error("Invalid move: ", e);
+        log.error("Invalid move: {}", e.getMessage());
         return new RedirectView(appConfig.getGithubUrl());
     }
 
     @ExceptionHandler(value = {NoResourceFoundException.class})
     public RedirectView handleInvalidEndpointRequest(NoResourceFoundException e) {
-        log.error("Invalid endpoint: ", e);
+        log.error("Invalid endpoint: {}", e.getMessage());
         return new RedirectView(appConfig.getGithubUrl());
     }
 
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<Object> handleOtherExceptions(Exception e) {
-        log.error("Internal error: ", e);
+        log.error("Internal error: {}", e.getMessage());
         return new ResponseEntity<>("Internal error, see the logs for more information", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
