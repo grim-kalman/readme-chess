@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Java version
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -47,7 +47,7 @@ jobs:
           name: java-app
 
       - name: Login to Azure
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_AB5E16208FF845C0BF7EC7944FC66825 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_181DBAAA1DD24480BF37FF8B67FD245E }}
