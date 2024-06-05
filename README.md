@@ -4,7 +4,7 @@ Readme Chess is a Java-based web application built with Spring Boot and Maven, d
 
 ## How It Works
 
-1. When a user makes a move or selects a square on the chess board, the corresponding endpoint in the `Controller` class is triggered.
+1. When a user makes a move or selects a square on the chess board, the corresponding endpoint in the `Controller` is triggered.
 2. The `ChessService` processes the move, updates the game state, and responds with the best move for the computer player using the Stockfish chess engine, through UCI commands.
 3. The updated game state is then pushed to my GitHub profile README file using the GitHub API.
 4. Lastly, the user is redirected back to the GitHub profile page to see the updated chess board.
