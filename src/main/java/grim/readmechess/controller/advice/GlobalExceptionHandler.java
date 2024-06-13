@@ -38,8 +38,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<String> handleInvalidEndpointRequest(NoHandlerFoundException e) {
-        log.error("Invalid endpoint: {}", e.getRequestURL());
-        return new ResponseEntity<>("Invalid endpoint: " + e.getRequestURL(), HttpStatus.NOT_FOUND);
+        log.error("Invalid request method or endpoint: {} {}", e.getHttpMethod(), e.getRequestURL());
+        return new ResponseEntity<>("Invalid request method or endpoint: " + e.getHttpMethod() + " " + e.getRequestURL(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
