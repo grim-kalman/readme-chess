@@ -17,19 +17,19 @@ public class Controller {
     private final ChessService chessService;
 
     @GetMapping("/play")
-    public RedirectView play(@RequestParam String move, HttpServletRequest request) throws Exception {
+    public synchronized RedirectView play(@RequestParam String move, HttpServletRequest request) throws Exception {
         chessService.play(move);
         return new RedirectView(appConfig.getGithubUrl());
     }
 
     @GetMapping("/select")
-    public RedirectView select(@RequestParam String square, HttpServletRequest request) throws Exception {
+    public synchronized RedirectView select(@RequestParam String square, HttpServletRequest request) throws Exception {
         chessService.select(square);
         return new RedirectView(appConfig.getGithubUrl());
     }
 
     @GetMapping("/new")
-    public RedirectView newGame(HttpServletRequest request) throws Exception {
+    public synchronized RedirectView newGame(HttpServletRequest request) throws Exception {
         chessService.newGame();
         return new RedirectView(appConfig.getGithubUrl());
     }
