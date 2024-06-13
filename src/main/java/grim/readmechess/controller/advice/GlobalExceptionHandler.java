@@ -5,10 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-import org.springframework.web.servlet.view.RedirectView;
 
 @ControllerAdvice
 @RequiredArgsConstructor
@@ -17,19 +18,31 @@ public class GlobalExceptionHandler {
 
     private final AppConfig appConfig;
 
-    @ExceptionHandler(value = {IllegalArgumentException.class})
-    public RedirectView handleIllegalArgumentException(IllegalArgumentException e) {
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
         log.error("Invalid move: {}", e.getMessage());
-        return new RedirectView(appConfig.getGithubUrl());
+        return new ResponseEntity<>("Invalid move: " + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = {NoResourceFoundException.class})
-    public RedirectView handleInvalidEndpointRequest(NoResourceFoundException e) {
-        log.error("Invalid endpoint: {}", e.getMessage());
-        return new RedirectView(appConfig.getGithubUrl());
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<String> handleMissingParams(MissingServletRequestParameterException ex) {
+        String name = ex.getParameterName();
+        return new ResponseEntity<>("Missing parameter: " + name, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = {Exception.class})
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<String> handleNoResourceFound(NoResourceFoundException e) {
+        log.error("Resource not found: {}", e.getMessage());
+        return new ResponseEntity<>("Resource not found: " + e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<String> handleInvalidEndpointRequest(NoHandlerFoundException e) {
+        log.error("Invalid endpoint: {}", e.getRequestURL());
+        return new ResponseEntity<>("Invalid endpoint: " + e.getRequestURL(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleOtherExceptions(Exception e) {
         log.error("Internal error: {}", e.getMessage());
         return new ResponseEntity<>("Internal error, see the logs for more information", HttpStatus.INTERNAL_SERVER_ERROR);

@@ -101,7 +101,9 @@ public class Board {
 
     private void movePiece(String fromSquare, String toSquare) {
         Piece piece = pieceService.getPieces().remove(fromSquare);
-        pieceService.getPieces().put(toSquare, piece);
+        if (piece != null) {
+            pieceService.getPieces().put(toSquare, piece);
+        }
     }
 
     private String extractFromSquare(String move) {
