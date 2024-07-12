@@ -36,12 +36,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Resource not found: " + e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<String> handleInvalidEndpointRequest(NoHandlerFoundException e) {
-        log.error("Invalid request method or endpoint: {} {}", e.getHttpMethod(), e.getRequestURL());
-        return new ResponseEntity<>("Invalid request method or endpoint: " + e.getHttpMethod() + " " + e.getRequestURL(), HttpStatus.NOT_FOUND);
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleOtherExceptions(Exception e) {
         log.error("Internal error: {}", e.getMessage());
