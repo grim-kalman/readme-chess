@@ -55,12 +55,11 @@ public class MarkdownBoardPrinter extends BoardPrinter {
         Piece selectedPiece = board.getPieceService().getPieces().get(selectedSquare);
         String squareSymbol = formatSquareSymbol(square);
 
-        if (selectedSquare != null) {
-            String move = formatMove(selectedPiece, selectedSquare + position, position);
-            if (moveValidator.isValid(move)) {
-                return createMarkdownLink(squareSymbol, "https://readmechess.azurewebsites.net/play?move=" + move);
-            }
+        String move = formatMove(selectedPiece, selectedSquare + position, position);
+        if (moveValidator.isValid(move)) {
+            return createMarkdownLink(squareSymbol, "https://readmechess.azurewebsites.net/play?move=" + move);
         }
+
         if (moveValidator.isStartOfValidMove(position)) {
             return createMarkdownLink(squareSymbol, "https://readmechess.azurewebsites.net/select?square=" + position);
         }
