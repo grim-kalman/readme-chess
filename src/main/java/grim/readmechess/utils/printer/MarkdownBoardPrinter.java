@@ -44,7 +44,7 @@ public class MarkdownBoardPrinter extends BoardPrinter {
         String header = "|     |  a  |  b  |  c  |  d  |  e  |  f  |  g  |  h  |\n";
         String separator = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
         String boardRepresentation = formatBoardRepresentation(createBoardRepresentation()) + "\n";
-        String newGameButton = "[![New Game](https://img.shields.io/badge/new_game-4CAF50)](https://readmechess.azurewebsites.net/new)";
+        String newGameButton = "[![New Game](https://img.shields.io/badge/New_Game-4CAF50)](https://readmechess.azurewebsites.net/new)";
         return header + separator + boardRepresentation + newGameButton;
     }
 
