@@ -2,13 +2,11 @@ package grim.readmechess.utils.printer;
 
 import grim.readmechess.model.chessboard.Board;
 import grim.readmechess.model.chesspieces.Piece;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static grim.readmechess.utils.common.Utils.columnToIndex;
 import static grim.readmechess.utils.common.Utils.rowToIndex;
 
-@Slf4j
 public abstract class BoardPrinter {
 
     protected final Board board;
