@@ -65,7 +65,6 @@ public class EngineService {
                 .orElse(lastEvaluation);
     }
 
-    @Cacheable(value = "validMovesCache", key = "#currentFen")
     public List<String> getValidMoves() {
         sendCommand("go perft 1");
         return output.lines()
