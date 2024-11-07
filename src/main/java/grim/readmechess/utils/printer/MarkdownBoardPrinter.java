@@ -30,9 +30,9 @@ public class MarkdownBoardPrinter extends BoardPrinter {
         
         ## How to Play
         
-        - **Select a piece:** Click on any selectable piece ([**A**]()) to select it.
-        - **Move the piece:** Click on any destination square ([**_**]()) to move the selected piece.
-        - **Wait for the page to refresh:** After each action, please wait for the page to refresh to see the updated game state.
+        - Click on any selectable piece ([**A**]()) to select it.
+        - Click on any destination square ([**_**]()) to move the selected piece.
+        - After each action, please wait for the page to refresh to see the updated game state.
         
         ## Chess Board
         """;

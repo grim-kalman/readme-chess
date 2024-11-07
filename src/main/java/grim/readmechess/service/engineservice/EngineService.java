@@ -4,6 +4,7 @@ import grim.readmechess.config.AppConfig;
 import grim.readmechess.service.engineservice.dto.EngineResponseDTO;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -64,6 +65,7 @@ public class EngineService {
                 .orElse(lastEvaluation);
     }
 
+    @Cacheable(value = "validMovesCache", key = "#currentFen")
     public List<String> getValidMoves() {
         sendCommand("go perft 1");
         return output.lines()
